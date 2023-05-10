@@ -15,6 +15,7 @@ private:
     int currentGeneration = 0, rows = 0, lines = 0;
     std::vector<std::vector<Cell>> cells;
     std::vector<std::vector<Cell>> previousCells;
+
     GoL() = default;
 
     ~GoL() = default;

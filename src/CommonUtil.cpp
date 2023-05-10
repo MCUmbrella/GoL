@@ -6,11 +6,14 @@
 #include <iostream>
 
 #ifdef _WIN32
-#include <windows.h>
-#else
-#include <unistd.h>
-#endif
 
+#include <windows.h>
+
+#else
+
+#include <unistd.h>
+
+#endif
 
 CellState CommonUtil::parseCellState(const char& c)
 {
