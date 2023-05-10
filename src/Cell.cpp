@@ -6,9 +6,15 @@
 
 std::string Cell::toString() const
 {
+#ifdef _WIN32
+    return state == STATE_BORDER ? "##" :
+           state == STATE_DEAD ? ". "
+                               : "[]";
+#else
     return state == STATE_BORDER ? "囗" :
            state == STATE_DEAD ? "丶"
                                : "回";
+#endif
 }
 
 Cell::Cell(CellState state)
