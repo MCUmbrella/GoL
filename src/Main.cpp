@@ -89,7 +89,7 @@ void mainLoop()
         CommonUtil::clearScreen();
         app.run().display(); // iterate once and display the new state
         cout << "Iterations: " << app.getCurrentGeneration()
-             << ", cell board: " << app.getLines() << " lines, " << app.getRows() << " rows" << endl;
+             << ". Board size: " << app.getRows() << "*" << app.getLines() << endl;
         flush(cout);
         CommonUtil::freeze(sleepMs); // wait a few moment to avoid the program from running too fast
     }
@@ -103,7 +103,7 @@ void handleSignal(int signal)
     CommonUtil::clearScreen();
     app.display();
     cout << "Current generation: " << app.getCurrentGeneration()
-         << ", cell board: " << app.getLines() << " lines, " << app.getRows() << " rows" << endl;
+         << ". Board size: " << app.getRows() << "*" << app.getLines() << endl;
 
     // ask for resume
     cout << "Resume? [y/N] ";
