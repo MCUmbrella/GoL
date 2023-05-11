@@ -1,7 +1,16 @@
+#include <csignal>
 #include "GoL.h"
 #include "CommonUtil.h"
 
 using namespace std;
+
+static bool flInfiniteGenerations = true;
+static unsigned int sleepMs = 500;
+static unsigned long targetGeneration;
+
+void handleSignal(int signal);
+
+void mainLoop();
 
 int main(int argc, char** argv)
 {
@@ -14,10 +23,6 @@ int main(int argc, char** argv)
              << " sleepMs:          Milliseconds to wait between iterations, default is 500." << endl;
         return 0;
     }
-
-    bool flInfiniteGenerations = true;
-    unsigned int sleepMs = 500;
-    unsigned long targetGeneration;
 
     string args[argc];
     for (int i = 0; i != argc; ++i)
@@ -54,6 +59,15 @@ int main(int argc, char** argv)
          << "Ready" << endl;
     CommonUtil::freeze(1000);
 
+    signal(SIGINT, handleSignal);
+    mainLoop();
+
+    return 0;
+}
+
+void mainLoop()
+{
+    GoL& app = GoL::getInstance();
     for (unsigned long i = 0LU; flInfiniteGenerations || i != targetGeneration; ++i)
     {
         CommonUtil::clearScreen();
@@ -62,6 +76,23 @@ int main(int argc, char** argv)
         flush(cout);
         CommonUtil::freeze(sleepMs);
     }
+}
 
-    return 0;
+void handleSignal(int signal)
+{
+    GoL& app = GoL::getInstance();
+    CommonUtil::clearScreen();
+    app.display();
+    cout << "Current generation: " << app.getCurrentGeneration() << ", cell board: " << app.getLines() << " lines, " << app.getRows() << " rows" << endl
+         << "Resume? [y/N] ";
+    flush(cout);
+    string s;
+    cin >> s;
+    if (s == "Y" || s == "y")
+    {
+        cout << "Resume";
+        flush(cout);
+        CommonUtil::freeze(1000);
+    }
+    else exit(0);
 }
