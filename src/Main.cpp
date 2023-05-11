@@ -13,7 +13,7 @@ static unsigned long targetGeneration;
  * Ctrl+C will pause the simulation and ask the user whether to resume.
  * @param signal currently no use.
  */
-void handleSignal(int signal);
+void handleSignal(int sig);
 
 /**
  * Performs the simulation.
@@ -80,7 +80,7 @@ void mainLoop()
     GoL& app = GoL::getInstance();
     for (unsigned long i = 0LU; flInfiniteGenerations || i != targetGeneration; ++i)
     {
-        if(flPause) //FIXME Ctrl+C only handled once on windows
+        if(flPause)
         {
             CommonUtil::freeze(500);
             --i;
@@ -95,7 +95,7 @@ void mainLoop()
     }
 }
 
-void handleSignal(int signal)
+void handleSignal(int sig)
 {
     flPause = true;
     // paused. display current state
@@ -111,5 +111,6 @@ void handleSignal(int signal)
     string s;
     cin >> s;
     if (s != "y" && s != "Y") exit(0);
+    signal(SIGINT, handleSignal);
     flPause = false;
 }
