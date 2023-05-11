@@ -4,7 +4,7 @@
 
 using namespace std;
 
-static bool flInfiniteGenerations = true;
+static bool flInfiniteGenerations = true, flPause = false;
 static unsigned int sleepMs = 500;
 static unsigned long targetGeneration;
 
@@ -80,6 +80,12 @@ void mainLoop()
     GoL& app = GoL::getInstance();
     for (unsigned long i = 0LU; flInfiniteGenerations || i != targetGeneration; ++i)
     {
+        if(flPause) //FIXME Ctrl+C only handled once on windows
+        {
+            CommonUtil::freeze(500);
+            --i;
+            continue;
+        }
         CommonUtil::clearScreen();
         app.run().display(); // iterate once and display the new state
         cout << "Iterations: " << app.getCurrentGeneration()
@@ -91,6 +97,7 @@ void mainLoop()
 
 void handleSignal(int signal)
 {
+    flPause = true;
     // paused. display current state
     GoL& app = GoL::getInstance();
     CommonUtil::clearScreen();
@@ -104,4 +111,5 @@ void handleSignal(int signal)
     string s;
     cin >> s;
     if (s != "y" && s != "Y") exit(0);
+    flPause = false;
 }
