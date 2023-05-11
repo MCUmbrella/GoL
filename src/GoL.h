@@ -7,7 +7,11 @@
 
 #include <iostream>
 #include <vector>
+#include <stack>
 #include "Cell.h"
+
+using std::vector;
+using std::stack;
 
 /**
  * The Game of Life engine, a singleton application.
@@ -17,8 +21,8 @@ class GoL
 private:
     bool flNoBorder = false;
     int currentGeneration = 0, rows = 0, lines = 0;
-    std::vector<std::vector<Cell>> cells; // the cell board
-    std::vector<std::vector<Cell>> previousCells; // the previous state of the cell board
+    vector<vector<Cell>> cells; // the cell board
+    stack<vector<vector<Cell>>> previousCells; // the previous state of the cell board
 
     GoL() = default;
 
@@ -98,7 +102,9 @@ public:
      * side after moving towards the edge.
      * @param status The new border status.
      */
-    GoL& toggleBorder(bool status);
+    GoL& toggleBorder(const bool& status);
+
+    GoL& redo(const int& steps);
 };
 
 #endif //GOL_GOL_H

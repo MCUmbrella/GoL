@@ -40,7 +40,7 @@ void CommonUtil::clearScreen()
 #endif
 }
 
-int CommonUtil::transparent(int x, int l)
+int CommonUtil::transparent(const int& x, const int& l)
 {
     return x % l == 0 ? l :
            x > 0 ? x % l :

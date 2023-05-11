@@ -92,29 +92,83 @@ void mainLoop()
         }
         CommonUtil::clearScreen();
         app.run().display(); // iterate once and display the new state
-        cout << "Iterations: " << app.getCurrentGeneration()
-             << ". Board size: " << app.getRows() << "*" << app.getLines() << endl;
+        cout << "Current generation: " << app.getCurrentGeneration()
+             << ". Board size: " << app.getRows() << "*" << app.getLines() << endl
+             << "[Ctrl+C]Pause" << endl;
         flush(cout);
         CommonUtil::freeze(sleepMs); // wait a few moment to avoid the program from running too fast
     }
+    cout << "Target generation reached" << endl;
 }
 
+/**
+ * Shows the pause screen when the program received SIGINT
+ * (usually triggered by pressing Ctrl+C).
+ * @param sig currently no use.
+ */
 void handleSignal(int sig)
 {
     flPause = true;
-    // paused. display current state
     GoL& app = GoL::getInstance();
-    CommonUtil::clearScreen();
-    app.display();
-    cout << "Current generation: " << app.getCurrentGeneration()
-         << ". Board size: " << app.getRows() << "*" << app.getLines() << endl;
 
-    // ask for resume
-    cout << "Resume? [y/N] ";
-    flush(cout);
-    string s;
-    cin >> s;
-    if (s != "y" && s != "Y") exit(0);
-    signal(SIGINT, handleSignal);
+    for (;;)
+    {
+        if (!cin) // someone pressed Ctrl+D, exit to avoid dead-loop
+        {
+            cout << "Exiting" << endl;
+            exit(0);
+        }
+        // display current state
+        CommonUtil::clearScreen();
+        app.display();
+        cout << "Current generation: " << app.getCurrentGeneration()
+             << ". Board size: " << app.getRows() << "*" << app.getLines() << endl;
+
+        // ask for option
+        cout << "[Q]Exit [W]Resume [E]Edit [R]Revert [T]Goto [Y]Export" << endl << "? ";
+        flush(cout);
+        string s;
+        cin >> s;
+        // check option
+        if (s == "q" || s == "Q") // exit
+        {
+            cout << "Exiting" << endl;
+            exit(0);
+        }
+        else if (s == "w" || s == "W") // resume
+        {
+            break;
+        }
+        else if (s == "e" || s == "E")
+        {
+            cout << "Enter: X Y State(1=alive, 0=dead)" << endl << "? ";
+            flush(cout);
+            int x, y, state;
+            if (cin >> x >> y >> state)
+                app.setStateOf(y, x, CommonUtil::parseCellState((char) ('0' + state)));
+            else
+            {
+                cin.clear();
+                fflush(stdin);
+            }
+            continue;
+        }
+        else if (s == "r" || s == "R") // revert
+        {
+            app.redo(1);
+        }
+        else if (s == "t" || s == "T") // goto
+        {
+            //TODO
+        }
+        else if (s == "y" || s == "Y") // export
+        {
+            //TODO
+        }
+        else continue; // invalid option, ask again
+    }
+
+    // resume
+    signal(SIGINT, handleSignal); // why re-register? cuz windows sucks
     flPause = false;
 }

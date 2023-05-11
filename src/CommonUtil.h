@@ -30,11 +30,11 @@ public:
 
     /**
      * @code
-     *            / l - (-x mod l)  (x＜0)
-     * t(x, l) = {  l               (x=0)
-     *            \ x mod l         (x＞0)
+     *            / l               (x mod l = 0)
+     * t(x, l) = {  x mod l         (x ＞ 0)
+     *            \ l - (-x mod l)  (x ＜ 0)
      */
-    static int transparent(int x, int l);
+    static int transparent(const int& x, const int& l);
 };
 
 #endif //GOL_COMMONUTIL_H

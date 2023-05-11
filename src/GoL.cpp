@@ -45,15 +45,19 @@ GoL& GoL::init(const string& initFilePath)
     string line;
     for (int i = 0; i != getLines(); ++i)
     {
-        if (in)
+        if (in >> line)
         {
-            in >> line;
             if (line.length() != getRows())
-                throw runtime_error(string("Invalid content"));
+                throw runtime_error(
+                        string("Line length mismatch: expected ").append(to_string(getRows()).append(" but got ").append(to_string(line.length())))
+                );
             for (int j = 0; j != getRows(); ++j)
                 setStateOf(i + 1, j + 1, CommonUtil::parseCellState(line.at(j)));
         }
-        else throw runtime_error(string("Unexpected EOF in input file"));
+        else
+            throw runtime_error(
+                    string("Total line number mismatch: expected ").append(to_string(getLines()).append(" but got ").append(to_string(i)))
+            );
     }
     cout << "Pattern setup completed" << endl;
     in.close();
@@ -63,7 +67,7 @@ GoL& GoL::init(const string& initFilePath)
 
 GoL& GoL::run()
 {
-    previousCells = vector<vector<Cell>>(cells);
+    previousCells.push(vector<vector<Cell>>(cells));
     calculateNextGeneration();
     applyNextGeneration();
     ++currentGeneration;
@@ -173,8 +177,21 @@ void GoL::setStateOf(const int& line, const int& row, CellState state)
     cells[line][row].setState(state);
 }
 
-GoL& GoL::toggleBorder(bool status)
+GoL& GoL::toggleBorder(const bool& status)
 {
     flNoBorder = status;
+    return *this;
+}
+
+GoL& GoL::redo(const int& steps)
+{
+    for (int i = 0; i != steps; i++)
+    {
+        if (previousCells.empty())
+            break;
+        cells = vector<vector<Cell>>(previousCells.top());
+        previousCells.pop();
+        --currentGeneration;
+    }
     return *this;
 }
