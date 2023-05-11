@@ -10,10 +10,22 @@
 class CommonUtil
 {
 public:
+    /**
+     * Parses the CellState from a character.
+     * @param c The character to parse.
+     * @return STATE_ALIVE if '1', STATE_DEAD if '0', otherwise STATE_BORDER.
+     */
     static CellState parseCellState(const char& c);
 
+    /**
+     * Freezes the program for a few moment.
+     * @param ms The milliseconds of the time to freeze.
+     */
     static void freeze(const unsigned int& ms);
 
+    /**
+     * Clears the terminal emulator.
+     */
     static void clearScreen();
 };
 
