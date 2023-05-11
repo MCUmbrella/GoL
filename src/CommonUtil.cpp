@@ -39,3 +39,10 @@ void CommonUtil::clearScreen()
     std::cout << "\033[2J" << "\033[H";
 #endif
 }
+
+int CommonUtil::transparent(int x, int l)
+{
+    return x % l == 0 ? l :
+           x > 0 ? x % l :
+           l - (-x % l);
+}

@@ -4,7 +4,7 @@
 
 using namespace std;
 
-static bool flInfiniteGenerations = true, flPause = false;
+static bool flInfiniteGenerations = true, flPause = false, flNoBorder = false;
 static unsigned int sleepMs = 500;
 static unsigned long targetGeneration;
 
@@ -24,11 +24,12 @@ int main(int argc, char** argv)
 {
     if (argc < 2) // no input file specified. print help message
     {
-        cout << "Usage: GoL <initFilePath> [--targetGeneration={}] [--sleepMs={}]" << endl
+        cout << "Usage: GoL <initFilePath> [--targetGeneration={}] [--sleepMs={}] [--noBorder]" << endl
              << "Parameters:" << endl
              << " initFilePath:     The path of the text file used for cell board initialization." << endl
-             << " targetGeneration: Maximum number of generation, default is flInfiniteGenerations." << endl
-             << " sleepMs:          Milliseconds to wait between iterations, default is 500." << endl;
+             << " targetGeneration: Maximum number of generation, default is infinite." << endl
+             << " sleepMs:          Milliseconds to wait between iterations, default is 500." << endl
+             << " noBorder:         Disable the border of the cell board." << endl;
         return 0;
     }
 
@@ -59,8 +60,11 @@ int main(int argc, char** argv)
             {
                 // use default: sleepMs = 500
             }
+        else if (args[i] == "--noBorder")
+            flNoBorder = true;
 
     GoL& app = GoL::getInstance();
+    app.toggleBorder(flNoBorder);
     app.init(args[1]); // pass the file path to the GoL simulator
     // display the initial state of the cell board
     cout << string(app.getRows() * 2, '=') << endl;
@@ -80,7 +84,7 @@ void mainLoop()
     GoL& app = GoL::getInstance();
     for (unsigned long i = 0LU; flInfiniteGenerations || i != targetGeneration; ++i)
     {
-        if(flPause)
+        if (flPause)
         {
             CommonUtil::freeze(500);
             --i;

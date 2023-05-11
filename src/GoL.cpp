@@ -145,6 +145,9 @@ int GoL::getRows() const
 
 Cell& GoL::getCell(const int& line, const int& row)
 {
+    if (flNoBorder)
+        return cells[CommonUtil::transparent(line, getLines())][CommonUtil::transparent(row, getRows())];
+
     if ((line < 1 || line > getLines()) || (row < 1 || row > getRows()))
         throw out_of_range(string("Location out of bounds"));
     return cells[line][row];
@@ -152,6 +155,9 @@ Cell& GoL::getCell(const int& line, const int& row)
 
 CellState GoL::getStateOf(const int& line, const int& row)
 {
+    if (flNoBorder)
+        return cells[CommonUtil::transparent(line, getLines())][CommonUtil::transparent(row, getRows())].getState();
+
     if ((line < 1 || line > getLines()) || (row < 1 || row > getRows()))
         return STATE_BORDER;
     return cells[line][row].getState();
@@ -159,7 +165,16 @@ CellState GoL::getStateOf(const int& line, const int& row)
 
 void GoL::setStateOf(const int& line, const int& row, CellState state)
 {
+    if (flNoBorder)
+        cells[CommonUtil::transparent(line, getLines())][CommonUtil::transparent(row, getRows())].setState(state);
+
     if ((line < 1 || line > getLines()) || (row < 1 || row > getRows()))
         throw out_of_range(string("Location out of bounds"));
     cells[line][row].setState(state);
+}
+
+GoL& GoL::toggleBorder(bool status)
+{
+    flNoBorder = status;
+    return *this;
 }

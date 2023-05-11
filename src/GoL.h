@@ -15,6 +15,7 @@
 class GoL
 {
 private:
+    bool flNoBorder = false;
     int currentGeneration = 0, rows = 0, lines = 0;
     std::vector<std::vector<Cell>> cells; // the cell board
     std::vector<std::vector<Cell>> previousCells; // the previous state of the cell board
@@ -89,6 +90,15 @@ public:
      * @param state The new state of the cell.
      */
     void setStateOf(const int& line, const int& row, CellState state);
+
+    /**
+     * Turns on/off the border.
+     * If the border has been turned off, the two sides of the cell board
+     * are connected, which means the cells will appear on the opposite
+     * side after moving towards the edge.
+     * @param status The new border status.
+     */
+    GoL& toggleBorder(bool status);
 };
 
 #endif //GOL_GOL_H

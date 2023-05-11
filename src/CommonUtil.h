@@ -27,6 +27,14 @@ public:
      * Clears the terminal emulator.
      */
     static void clearScreen();
+
+    /**
+     * @code
+     *            / l - (-x mod l)  (x＜0)
+     * t(x, l) = {  l               (x=0)
+     *            \ x mod l         (x＞0)
+     */
+    static int transparent(int x, int l);
 };
 
 #endif //GOL_COMMONUTIL_H
