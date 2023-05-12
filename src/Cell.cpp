@@ -42,3 +42,10 @@ void Cell::setNextState(CellState newState)
 {
     nextState = newState;
 }
+
+char Cell::toChar() const
+{
+    return state == STATE_BORDER ? '#' :
+           state == STATE_DEAD ? '0' :
+           '1';
+}

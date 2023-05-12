@@ -49,13 +49,18 @@ public:
     GoL& init(const std::string& initFilePath);
 
     /**
-     * Do a iteration.
+     * Save the cell board to a local file.
+     * @param filePath The path of the file
+     */
+    GoL& save(const std::string& filePath);
+
+    /**
+     * Do an iteration.
      */
     GoL& run();
 
     /**
      * Prints the current state of the cell board to the terminal.
-     * @return
      */
     GoL& display();
 

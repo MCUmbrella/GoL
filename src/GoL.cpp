@@ -65,6 +65,23 @@ GoL& GoL::init(const string& initFilePath)
     return *this;
 }
 
+GoL& GoL::save(const string& filePath)
+{
+    ofstream out(filePath);
+    if (!out.bad())
+    {
+        out << getLines() << ' ' << getRows() << endl;
+        for (int i = 1; i <= getLines(); ++i)
+        {
+            for (int j = 1; j <= getRows(); ++j)
+                out << cells[i][j].toChar();
+            out << endl;
+        }
+        out.close();
+    }
+    return *this;
+}
+
 GoL& GoL::run()
 {
     previousCells.push(vector<vector<Cell>>(cells));

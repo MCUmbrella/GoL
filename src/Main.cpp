@@ -185,7 +185,13 @@ void handleSignal(int sig)
         }
         else if (s == "y" || s == "Y") // export
         {
-            //TODO
+            cout << "Enter: File path" << endl << "? ";
+            flush(cout);
+            string path;
+            cin >> path;
+            app.save(path);
+            cin.clear();
+            fflush(stdin);
         }
         else continue; // invalid option, ask again
     }

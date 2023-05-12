@@ -37,6 +37,8 @@ public:
      * The exact look depends on the operating system.
      */
     std::string toString() const;
+
+    char toChar() const;
 };
 
 #endif //GOL_CELL_H
