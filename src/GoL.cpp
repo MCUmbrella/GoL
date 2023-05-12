@@ -183,7 +183,7 @@ GoL& GoL::toggleBorder(const bool& status)
     return *this;
 }
 
-GoL& GoL::redo(const int& steps)
+GoL& GoL::revert(const int& steps)
 {
     for (int i = 0; i != steps; i++)
     {
@@ -193,5 +193,13 @@ GoL& GoL::redo(const int& steps)
         previousCells.pop();
         --currentGeneration;
     }
+    return *this;
+}
+
+GoL& GoL::forward(const int& steps)
+{
+    if (steps > 0)
+        for (int i = 0; i != steps; ++i)
+            run();
     return *this;
 }

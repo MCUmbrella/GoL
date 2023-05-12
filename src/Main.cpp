@@ -144,22 +144,44 @@ void handleSignal(int sig)
             cout << "Enter: X Y State(1=alive, 0=dead)" << endl << "? ";
             flush(cout);
             int x, y, state;
-            if (cin >> x >> y >> state)
+            if (cin >> x >> y >> state && x > 0 && x <= app.getRows() && y > 0 && y <= app.getLines())
                 app.setStateOf(y, x, CommonUtil::parseCellState((char) ('0' + state)));
+            else // invalid input, clear stdin and ask again
+            {
+                cin.clear();
+                fflush(stdin);
+            }
+        }
+        else if (s == "r" || s == "R") // revert
+        {
+            app.revert(1);
+        }
+        else if (s == "t" || s == "T") // goto
+        {
+            cout << "Enter: Target generation" << endl << "? ";
+            flush(cout);
+            int g;
+            if (cin >> g)
+            {
+                if (g == app.getCurrentGeneration()) continue;
+                if (g > app.getCurrentGeneration())
+                {
+                    cout << "Please wait";
+                    flush(cout);
+                    app.forward(g - app.getCurrentGeneration());
+                }
+                else
+                {
+                    cout << "Please wait";
+                    flush(cout);
+                    app.revert(app.getCurrentGeneration() - g);
+                }
+            }
             else
             {
                 cin.clear();
                 fflush(stdin);
             }
-            continue;
-        }
-        else if (s == "r" || s == "R") // revert
-        {
-            app.redo(1);
-        }
-        else if (s == "t" || s == "T") // goto
-        {
-            //TODO
         }
         else if (s == "y" || s == "Y") // export
         {

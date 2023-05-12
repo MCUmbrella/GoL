@@ -104,7 +104,15 @@ public:
      */
     GoL& toggleBorder(const bool& status);
 
-    GoL& redo(const int& steps);
+    /**
+     * Undo a specified amount of iterations.
+     */
+    GoL& revert(const int& steps);
+
+    /**
+     * Do a specified amount of iterations.
+     */
+    GoL& forward(const int& steps);
 };
 
 #endif //GOL_GOL_H
