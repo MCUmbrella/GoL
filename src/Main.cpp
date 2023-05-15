@@ -9,15 +9,32 @@ static unsigned int sleepMs = 500;
 static unsigned long targetGeneration;
 
 /**
- * Handles the Ctrl+C event while the simulation is running.
- * Ctrl+C will pause the simulation and ask the user whether to resume.
+ * Shows the context menu, and the user can do do some
+ * operations (e.g. revert, edit and export).
+ * <br>
+ * The menu will be shown at the beginning of an infinite
+ * simulation and every time the user presses Ctrl+C.
  */
-void handleSignal(int);
+void showMenu(int);
 
 /**
- * Performs the simulation.
+ * Performs the automated simulation.
  */
 void mainLoop();
+
+/**
+ * Resets the standard input.
+ */
+void resetStdin()
+{
+    // clear the buffer
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+    fflush(stdin);
+    // reset the error state
+    clearerr(stdin);
+    cin.clear();
+}
 
 int main(int argc, char** argv)
 {
@@ -65,14 +82,10 @@ int main(int argc, char** argv)
     GoL& app = GoL::getInstance();
     app.toggleBorder(flNoBorder);
     app.init(args[1]); // pass the file path to the GoL simulator
-    // display the initial state of the cell board
-    cout << string(app.getRows() * 2, '=') << endl;
-    app.display();
-    cout << string(app.getRows() * 2, '=') << endl
-         << "Ready" << endl;
-    CommonUtil::freeze(1000);
+    // display initial state if target generation is not specified
+    if (flInfiniteGenerations) showMenu(0);
 
-    signal(SIGINT, handleSignal); // register for Ctrl+C event
+    signal(SIGINT, showMenu); // register for Ctrl+C event
     mainLoop();
 
     return 0;
@@ -81,12 +94,11 @@ int main(int argc, char** argv)
 void mainLoop()
 {
     GoL& app = GoL::getInstance();
-    for (unsigned long i = 0LU; flInfiniteGenerations || i != targetGeneration; ++i)
+    while (flInfiniteGenerations || app.getCurrentGeneration() != targetGeneration)
     {
         if (flPause)
         {
             CommonUtil::freeze(500);
-            --i;
             continue;
         }
         CommonUtil::clearScreen();
@@ -100,22 +112,13 @@ void mainLoop()
     cout << "Target generation reached" << endl;
 }
 
-/**
- * Shows the pause screen when the program received SIGINT
- * (usually triggered by pressing Ctrl+C).
- */
-void handleSignal(int)
+void showMenu(int)
 {
     flPause = true;
     GoL& app = GoL::getInstance();
 
     for (;;)
     {
-        if (!cin) // someone pressed Ctrl+D, exit to avoid dead-loop
-        {
-            cout << "Exiting" << endl;
-            exit(0);
-        }
         // display current state
         CommonUtil::clearScreen();
         app.display();
@@ -123,7 +126,7 @@ void handleSignal(int)
              << ". Board size: " << app.getRows() << "*" << app.getLines() << endl;
 
         // ask for option
-        cout << "[Q]Exit [W]Resume [E]Edit [R]Revert [T]Goto [Y]Export" << endl << "? ";
+        cout << "[Q]Exit [W]Start/Resume [E]Edit [R]Revert [T]Goto [Y]Export" << endl << "? ";
         flush(cout);
         string s;
         cin >> s;
@@ -141,14 +144,10 @@ void handleSignal(int)
         {
             cout << "Enter: X Y State(1=alive, 0=dead)" << endl << "? ";
             flush(cout);
-            int x, y, state;
+            int x, y;
+            char state;
             if (cin >> x >> y >> state && x > 0 && x <= app.getRows() && y > 0 && y <= app.getLines())
-                app.setStateOf(y, x, CommonUtil::parseCellState((char) ('0' + state)));
-            else // invalid input, clear stdin and ask again
-            {
-                cin.clear();
-                fflush(stdin);
-            }
+                app.setStateOf(y, x, CommonUtil::parseCellState(state));
         }
         else if (s == "r" || s == "R") // revert
         {
@@ -175,11 +174,6 @@ void handleSignal(int)
                     app.revert(app.getCurrentGeneration() - g);
                 }
             }
-            else
-            {
-                cin.clear();
-                fflush(stdin);
-            }
         }
         else if (s == "y" || s == "Y") // export
         {
@@ -187,14 +181,13 @@ void handleSignal(int)
             flush(cout);
             string path;
             cin >> path;
-            app.save(path);
-            cin.clear();
-            fflush(stdin);
+            if (!path.empty()) app.save(path);
         }
-        else continue; // invalid option, ask again
+        resetStdin(); // invalid input, ask again
     }
+    resetStdin();
 
     // resume
-    signal(SIGINT, handleSignal); // why re-register? cuz windows sucks
+    signal(SIGINT, showMenu); // why re-register? cuz windows sucks
     flPause = false;
 }

@@ -21,15 +21,15 @@ private:
 public:
     Cell() = default;
 
-    explicit Cell(CellState state);
+    explicit Cell(const CellState& state);
 
     CellState getState() const;
 
-    void setState(CellState newState);
+    void setState(const CellState& newState);
 
     CellState getNextState() const;
 
-    void setNextState(CellState newState);
+    void setNextState(const CellState& newState);
 
     /**
      * Converts the cell to string.
