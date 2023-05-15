@@ -11,8 +11,9 @@ static unsigned long targetGeneration;
 /**
  * Handles the Ctrl+C event while the simulation is running.
  * Ctrl+C will pause the simulation and ask the user whether to resume.
+ * @param signal currently no use.
  */
-void handleSignal(int);
+void handleSignal(int sig);
 
 /**
  * Performs the simulation.
@@ -28,7 +29,7 @@ int main(int argc, char** argv)
              << " initFilePath:     The path of the text file used for cell board initialization." << endl
              << " targetGeneration: Maximum number of generation, default is infinite." << endl
              << " sleepMs:          Milliseconds to wait between iterations, default is 500." << endl
-             << " noBorder:         Turn on the transparent border feature." << endl;
+             << " noBorder:         Disable the border of the cell board." << endl;
         return 0;
     }
 
@@ -66,9 +67,10 @@ int main(int argc, char** argv)
     app.toggleBorder(flNoBorder);
     app.init(args[1]); // pass the file path to the GoL simulator
     // display the initial state of the cell board
-    app.display(false);
-    cout<<"Ready";
-    cout.flush();
+    cout << string(app.getRows() * 2, '=') << endl;
+    app.display();
+    cout << string(app.getRows() * 2, '=') << endl
+         << "Ready" << endl;
     CommonUtil::freeze(1000);
 
     signal(SIGINT, handleSignal); // register for Ctrl+C event
@@ -89,11 +91,11 @@ void mainLoop()
             continue;
         }
         CommonUtil::clearScreen();
-        app.run().display(false); // iterate once and display the new state
+        app.run().display(); // iterate once and display the new state
         cout << "Current generation: " << app.getCurrentGeneration()
              << ". Board size: " << app.getRows() << "*" << app.getLines() << endl
              << "[Ctrl+C]Pause" << endl;
-        cout.flush();
+        flush(cout);
         CommonUtil::freeze(sleepMs); // wait a few moment to avoid the program from running too fast
     }
     cout << "Target generation reached" << endl;
@@ -102,8 +104,9 @@ void mainLoop()
 /**
  * Shows the pause screen when the program received SIGINT
  * (usually triggered by pressing Ctrl+C).
+ * @param sig currently no use.
  */
-void handleSignal(int)
+void handleSignal(int sig)
 {
     flPause = true;
     GoL& app = GoL::getInstance();
@@ -117,15 +120,13 @@ void handleSignal(int)
         }
         // display current state
         CommonUtil::clearScreen();
-        app.display(false);
+        app.display();
         cout << "Current generation: " << app.getCurrentGeneration()
              << ". Board size: " << app.getRows() << "*" << app.getLines() << endl;
 
         // ask for option
         cout << "[Q]Exit [W]Resume [E]Edit [R]Revert [T]Goto [Y]Export" << endl << "? ";
-        cout.flush();
-        cin.clear();
-        fflush(stdin);
+        flush(cout);
         string s;
         cin >> s;
         // check option
@@ -140,12 +141,16 @@ void handleSignal(int)
         }
         else if (s == "e" || s == "E")
         {
-            cout << "Enter: X Y State(1=alive, 0=dead, other=border)" << endl << "? ";
-            cout.flush();
-            int x, y;
-            char state;
+            cout << "Enter: X Y State(1=alive, 0=dead)" << endl << "? ";
+            flush(cout);
+            int x, y, state;
             if (cin >> x >> y >> state && x > 0 && x <= app.getRows() && y > 0 && y <= app.getLines())
-                app.setStateOf(y, x, CommonUtil::parseCellState((char) (state)));
+                app.setStateOf(y, x, CommonUtil::parseCellState((char) ('0' + state)));
+            else // invalid input, clear stdin and ask again
+            {
+                cin.clear();
+                fflush(stdin);
+            }
         }
         else if (s == "r" || s == "R") // revert
         {
@@ -154,7 +159,7 @@ void handleSignal(int)
         else if (s == "t" || s == "T") // goto
         {
             cout << "Enter: Target generation" << endl << "? ";
-            cout.flush();
+            flush(cout);
             int g;
             if (cin >> g)
             {
@@ -162,24 +167,31 @@ void handleSignal(int)
                 if (g > app.getCurrentGeneration())
                 {
                     cout << "Please wait";
-                    cout.flush();
+                    flush(cout);
                     app.forward(g - app.getCurrentGeneration());
                 }
                 else
                 {
                     cout << "Please wait";
-                    cout.flush();
+                    flush(cout);
                     app.revert(app.getCurrentGeneration() - g);
                 }
+            }
+            else
+            {
+                cin.clear();
+                fflush(stdin);
             }
         }
         else if (s == "y" || s == "Y") // export
         {
             cout << "Enter: File path" << endl << "? ";
-            cout.flush();
+            flush(cout);
             string path;
             cin >> path;
             app.save(path);
+            cin.clear();
+            fflush(stdin);
         }
         else continue; // invalid option, ask again
     }
