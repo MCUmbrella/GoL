@@ -100,11 +100,6 @@ void GoL::calculateNextGeneration()
         {
             neighbours = 0;
             Cell& c = getCell(i, j);
-            if (c.getState() == STATE_BORDER)
-            {
-                c.setNextState(STATE_BORDER);
-                continue;
-            }
             if (getStateOf(i - 1, j - 1) == STATE_ALIVE) ++neighbours;
             if (getStateOf(i - 1, j) == STATE_ALIVE) ++neighbours;
             if (getStateOf(i - 1, j + 1) == STATE_ALIVE) ++neighbours;
@@ -127,6 +122,7 @@ void GoL::calculateNextGeneration()
                 else
                     c.setNextState(STATE_DEAD);
             }
+            else c.setNextState(STATE_BORDER);
         }
     }
 }
