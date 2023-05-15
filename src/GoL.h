@@ -61,8 +61,9 @@ public:
 
     /**
      * Prints the current state of the cell board to the terminal.
+     * @param full If true, also print the hidden border of the cell board.
      */
-    GoL& display();
+    GoL& display(const bool& full);
 
     int getCurrentGeneration() const;
 
@@ -98,7 +99,7 @@ public:
      * @param row Row number, start from 1.
      * @param state The new state of the cell.
      */
-    void setStateOf(const int& line, const int& row, CellState state);
+    void setStateOf(const int& line, const int& row, const CellState& state);
 
     /**
      * Turns on/off the border.
@@ -108,6 +109,11 @@ public:
      * @param status The new border status.
      */
     GoL& toggleBorder(const bool& status);
+
+    /**
+     * Check if the cell board has transparent border.
+     */
+    bool isNoBorder() const;
 
     /**
      * Undo a specified amount of iterations.

@@ -3,6 +3,7 @@
 //
 
 #include "Cell.h"
+#include "GoL.h"
 
 std::string Cell::toString() const
 {
@@ -17,8 +18,10 @@ std::string Cell::toString() const
 #endif
 }
 
-Cell::Cell(CellState state)
+Cell::Cell(const int& line, const int& row, const CellState& state)
 {
+    this->line = line;
+    this->row = row;
     this->state = state;
     this->nextState = state;
 }
@@ -28,7 +31,7 @@ CellState Cell::getState() const
     return state;
 }
 
-void Cell::setState(CellState newState)
+void Cell::setState(const CellState& newState)
 {
     state = newState;
 }
@@ -38,7 +41,7 @@ CellState Cell::getNextState() const
     return nextState;
 }
 
-void Cell::setNextState(CellState newState)
+void Cell::setNextState(const CellState& newState)
 {
     nextState = newState;
 }
@@ -48,4 +51,39 @@ char Cell::toChar() const
     return state == STATE_BORDER ? '#' :
            state == STATE_DEAD ? '0' :
            '1';
+}
+
+CellState Cell::calculateNextState() const
+{
+    if (state == STATE_BORDER) return STATE_BORDER;
+
+    int aliveNeighbours = 0;
+    GoL& app = GoL::getInstance();
+    if (app.isNoBorder()) // transparent border, call the engine's function with coordinate mapping
+    {
+        if (app.getStateOf(line - 1, row - 1) == STATE_ALIVE) ++aliveNeighbours;
+        if (app.getStateOf(line - 1, row) == STATE_ALIVE) ++aliveNeighbours;
+        if (app.getStateOf(line - 1, row + 1) == STATE_ALIVE) ++aliveNeighbours;
+        if (app.getStateOf(line, row - 1) == STATE_ALIVE) ++aliveNeighbours;
+        if (app.getStateOf(line, row + 1) == STATE_ALIVE) ++aliveNeighbours;
+        if (app.getStateOf(line + 1, row - 1) == STATE_ALIVE) ++aliveNeighbours;
+        if (app.getStateOf(line + 1, row) == STATE_ALIVE) ++aliveNeighbours;
+        if (app.getStateOf(line + 1, row + 1) == STATE_ALIVE) ++aliveNeighbours;
+    }
+    else // use internal cache
+    {
+        for (Cell* c : neighbours)
+            if (c->state == STATE_ALIVE) ++aliveNeighbours;
+    }
+
+    return aliveNeighbours == 3 || (state == STATE_ALIVE && aliveNeighbours == 2) ? STATE_ALIVE : STATE_DEAD;
+}
+
+Cell& Cell::addNeighbour(Cell* c)
+{
+    static unsigned char i = 0;
+    neighbours[i] = c;
+    i++;
+    i %= 8;
+    return *this;
 }

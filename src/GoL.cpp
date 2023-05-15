@@ -32,12 +32,25 @@ GoL& GoL::init(const string& initFilePath)
     cout << "Initializing cell board with size " << rows - 2 << " * " << lines - 2 << endl;
     cells = vector<vector<Cell>>(lines);
     for (int i = 0; i != lines; ++i)
-    {
-        cells[i] = vector<Cell>(rows);
-        for (int j = 1; j != rows - 1; ++j)
-            if (i != 0 && i <= getLines())
-                cells[i][j].setState(STATE_DEAD);
-    }
+        for (int j = 0; j != rows; ++j)
+            if (i == 0 || i == lines - 1)
+                cells[i].emplace_back(i, j, STATE_BORDER);
+            else
+                cells[i].emplace_back(i, j, j == 0 || j == rows - 1 ? STATE_BORDER : STATE_DEAD);
+
+    for (int i = 1; i <= getLines(); ++i)
+        for (int j = 1; j <= getRows(); ++j)
+        {
+            Cell& c = cells[i][j];
+            c.addNeighbour(&(cells[i - 1][j - 1]))
+             .addNeighbour(&(cells[i - 1][j]))
+             .addNeighbour(&(cells[i - 1][j + 1]))
+             .addNeighbour(&(cells[i][j - 1]))
+             .addNeighbour(&(cells[i][j + 1]))
+             .addNeighbour(&(cells[i + 1][j - 1]))
+             .addNeighbour(&(cells[i + 1][j]))
+             .addNeighbour(&(cells[i + 1][j + 1]));
+        }
     cout << "Cell board initialization completed" << endl;
 
     // read the pattern from the input file
@@ -93,38 +106,9 @@ GoL& GoL::run()
 
 void GoL::calculateNextGeneration()
 {
-    int neighbours;
     for (int i = 1; i <= getLines(); ++i)
-    {
         for (int j = 1; j <= getRows(); ++j)
-        {
-            neighbours = 0;
-            Cell& c = getCell(i, j);
-            if (getStateOf(i - 1, j - 1) == STATE_ALIVE) ++neighbours;
-            if (getStateOf(i - 1, j) == STATE_ALIVE) ++neighbours;
-            if (getStateOf(i - 1, j + 1) == STATE_ALIVE) ++neighbours;
-            if (getStateOf(i, j - 1) == STATE_ALIVE) ++neighbours;
-            if (getStateOf(i, j + 1) == STATE_ALIVE) ++neighbours;
-            if (getStateOf(i + 1, j - 1) == STATE_ALIVE) ++neighbours;
-            if (getStateOf(i + 1, j) == STATE_ALIVE) ++neighbours;
-            if (getStateOf(i + 1, j + 1) == STATE_ALIVE) ++neighbours;
-            if (c.getState() == STATE_ALIVE)
-            {
-                if (neighbours == 2 || neighbours == 3)
-                    c.setNextState(STATE_ALIVE);
-                else
-                    c.setNextState(STATE_DEAD);
-            }
-            else if (c.getState() == STATE_DEAD)
-            {
-                if (neighbours == 3)
-                    c.setNextState(STATE_ALIVE);
-                else
-                    c.setNextState(STATE_DEAD);
-            }
-            else c.setNextState(STATE_BORDER);
-        }
-    }
+            cells[i][j].setNextState(cells[i][j].calculateNextState());
 }
 
 void GoL::applyNextGeneration()
@@ -139,14 +123,22 @@ void GoL::applyNextGeneration()
     }
 }
 
-GoL& GoL::display()
+GoL& GoL::display(const bool& full)
 {
-    for (int i = 1; i <= getLines(); ++i)
-    {
-        for (int j = 1; j <= getRows(); ++j)
-            cout << cells[i][j].toString();
-        cout << endl;
-    }
+    if (full)
+        for (int i = 0; i != lines; ++i)
+        {
+            for (int j = 0; j != rows; ++j)
+                cout << cells[i][j].toString();
+            cout << endl;
+        }
+    else
+        for (int i = 1; i <= getLines(); ++i)
+        {
+            for (int j = 1; j <= getRows(); ++j)
+                cout << cells[i][j].toString();
+            cout << endl;
+        }
     return *this;
 }
 
@@ -185,7 +177,7 @@ CellState GoL::getStateOf(const int& line, const int& row)
     return cells[line][row].getState();
 }
 
-void GoL::setStateOf(const int& line, const int& row, CellState state)
+void GoL::setStateOf(const int& line, const int& row, const CellState& state)
 {
     if (flNoBorder)
         cells[CommonUtil::transparent(line, getLines())][CommonUtil::transparent(row, getRows())].setState(state);
@@ -201,9 +193,14 @@ GoL& GoL::toggleBorder(const bool& status)
     return *this;
 }
 
+bool GoL::isNoBorder() const
+{
+    return flNoBorder;
+}
+
 GoL& GoL::revert(const int& steps)
 {
-    for (int i = 0; i != steps; i++)
+    for (int i = 0; i != steps; ++i)
     {
         if (previousCells.empty())
             break;
