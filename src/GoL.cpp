@@ -97,8 +97,13 @@ void GoL::calculateNextGeneration()
     {
         for (int j = 1; j <= getRows(); ++j)
         {
-            neighbours = 0;
             Cell& c = getCell(i, j);
+            if (c.getState() == STATE_BORDER)
+            {
+                c.setNextState(STATE_BORDER);
+                continue;
+            }
+            neighbours = 0;
             if (getStateOf(i - 1, j - 1) == STATE_ALIVE) ++neighbours;
             if (getStateOf(i - 1, j) == STATE_ALIVE) ++neighbours;
             if (getStateOf(i - 1, j + 1) == STATE_ALIVE) ++neighbours;
@@ -107,21 +112,7 @@ void GoL::calculateNextGeneration()
             if (getStateOf(i + 1, j - 1) == STATE_ALIVE) ++neighbours;
             if (getStateOf(i + 1, j) == STATE_ALIVE) ++neighbours;
             if (getStateOf(i + 1, j + 1) == STATE_ALIVE) ++neighbours;
-            if (c.getState() == STATE_ALIVE)
-            {
-                if (neighbours == 2 || neighbours == 3)
-                    c.setNextState(STATE_ALIVE);
-                else
-                    c.setNextState(STATE_DEAD);
-            }
-            else if (c.getState() == STATE_DEAD)
-            {
-                if (neighbours == 3)
-                    c.setNextState(STATE_ALIVE);
-                else
-                    c.setNextState(STATE_DEAD);
-            }
-            else c.setNextState(STATE_BORDER);
+            c.setNextState(neighbours == 3 || (c.getState() == STATE_ALIVE && neighbours == 2) ? STATE_ALIVE : STATE_DEAD);
         }
     }
 }
