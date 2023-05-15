@@ -11,9 +11,8 @@ static unsigned long targetGeneration;
 /**
  * Handles the Ctrl+C event while the simulation is running.
  * Ctrl+C will pause the simulation and ask the user whether to resume.
- * @param signal currently no use.
  */
-void handleSignal(int sig);
+void handleSignal(int);
 
 /**
  * Performs the simulation.
@@ -104,9 +103,8 @@ void mainLoop()
 /**
  * Shows the pause screen when the program received SIGINT
  * (usually triggered by pressing Ctrl+C).
- * @param sig currently no use.
  */
-void handleSignal(int sig)
+void handleSignal(int)
 {
     flPause = true;
     GoL& app = GoL::getInstance();

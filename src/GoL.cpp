@@ -203,7 +203,7 @@ GoL& GoL::toggleBorder(const bool& status)
 
 GoL& GoL::revert(const int& steps)
 {
-    for (int i = 0; i != steps; i++)
+    for (int i = 0; i != steps; ++i)
     {
         if (previousCells.empty())
             break;
