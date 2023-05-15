@@ -32,12 +32,11 @@ GoL& GoL::init(const string& initFilePath)
     cout << "Initializing cell board with size " << rows - 2 << " * " << lines - 2 << endl;
     cells = vector<vector<Cell>>(lines);
     for (int i = 0; i != lines; ++i)
-    {
-        cells[i] = vector<Cell>(rows);
-        for (int j = 1; j != rows - 1; ++j)
-            if (i != 0 && i <= getLines())
-                cells[i][j].setState(STATE_DEAD);
-    }
+        for (int j = 0; j != rows; ++j)
+            if (i == 0 || i == lines - 1)
+                cells[i].emplace_back(STATE_BORDER);
+            else
+                cells[i].emplace_back(j == 0 || j == rows - 1 ? STATE_BORDER : STATE_DEAD);
     cout << "Cell board initialization completed" << endl;
 
     // read the pattern from the input file
@@ -203,7 +202,7 @@ GoL& GoL::toggleBorder(const bool& status)
 
 GoL& GoL::revert(const int& steps)
 {
-    for (int i = 0; i != steps; i++)
+    for (int i = 0; i != steps; ++i)
     {
         if (previousCells.empty())
             break;

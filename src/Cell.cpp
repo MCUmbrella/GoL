@@ -17,7 +17,7 @@ std::string Cell::toString() const
 #endif
 }
 
-Cell::Cell(CellState state)
+Cell::Cell(const CellState& state)
 {
     this->state = state;
     this->nextState = state;
@@ -28,7 +28,7 @@ CellState Cell::getState() const
     return state;
 }
 
-void Cell::setState(CellState newState)
+void Cell::setState(const CellState& newState)
 {
     state = newState;
 }
@@ -38,7 +38,7 @@ CellState Cell::getNextState() const
     return nextState;
 }
 
-void Cell::setNextState(CellState newState)
+void Cell::setNextState(const CellState& newState)
 {
     nextState = newState;
 }
