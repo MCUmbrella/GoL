@@ -59,17 +59,20 @@ GoL& GoL::init(const string& initFilePath)
         if (in >> line)
         {
             if (line.length() != getRows())
-                throw runtime_error(
-                        (stringstream() << "Line length mismatch: at line " << i + 1
-                                        << " expected " << getRows() << " but got " << line.length()).str()
-                );
+            {
+                stringstream msg;
+                msg << "Line length mismatch: at line " << i + 1 << " expected " << getRows() << " but got " << line.length();
+                throw runtime_error(msg.str());
+            }
             for (int j = 0; j != getRows(); ++j)
                 setStateOf(i + 1, j + 1, CommonUtil::parseCellState(line[j]));
         }
         else
-            throw runtime_error(
-                    (stringstream() << "Total line number mismatch: expected " << getLines() << " but got " << i).str()
-            );
+        {
+            stringstream msg;
+            msg << "Total line number mismatch: expected " << getLines() << " but got " << i;
+            throw runtime_error(msg.str());
+        }
     }
     cout << "Pattern setup completed" << endl;
     in.close();
