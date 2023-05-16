@@ -40,8 +40,9 @@ int main(int argc, char** argv)
 {
     if (argc < 2) // no input file specified. print help message
     {
-        cout << "Usage: GoL <initFilePath> [--targetGeneration={}] [--sleepMs={}] [--noBorder]" << endl
+        cout << "Usage: GoL <--new / initFilePath> [--targetGeneration={}] [--sleepMs={}] [--noBorder]" << endl
              << "Parameters:" << endl
+             << " new:              Create a new empty cell board." << endl
              << " initFilePath:     The path of the text file used for cell board initialization." << endl
              << " targetGeneration: Maximum number of generation, default is infinite." << endl
              << " sleepMs:          Milliseconds to wait between iterations, default is 500." << endl
@@ -80,9 +81,22 @@ int main(int argc, char** argv)
 
     GoL& app = GoL::getInstance();
     app.toggleBorder(flNoBorder);
-    app.init(args[0]); // pass the file path to the GoL simulator
-    // display initial state if target generation is not specified
-    if (flInfiniteGenerations) showMenu(0);
+    if (args[0] == "--new") // create new board
+    {
+        int lines = 0, rows = 0;
+        cout << "Enter: Size (X Y)" << endl << "? ";
+        cout.flush();
+        cin >> rows >> lines;
+        app.init(lines, rows);
+        showMenu(0);
+    }
+    else // load the board from local file
+    {
+        // pass the file path to the GoL simulator
+        app.init(args[0]);
+        // display initial state if target generation is not specified
+        if (flInfiniteGenerations) showMenu(0);
+    }
 
     signal(SIGINT, showMenu); // register for Ctrl+C event
     mainLoop();
