@@ -29,9 +29,9 @@ GoL& GoL::init(const int& initLines, const int& initRows)
     for (int i = 0; i != lines; ++i)
         for (int j = 0; j != rows; ++j)
             if (i == 0 || i == lines - 1)
-                cells[i].emplace_back(STATE_BORDER);
+                cells[i].emplace_back(i, j, STATE_BORDER);
             else
-                cells[i].emplace_back(j == 0 || j == rows - 1 ? STATE_BORDER : STATE_DEAD);
+                cells[i].emplace_back(i, j, j == 0 || j == rows - 1 ? STATE_BORDER : STATE_DEAD);
 
     cout << "Cell board initialization completed" << endl;
     return *this;
@@ -103,27 +103,12 @@ GoL& GoL::run()
 
 void GoL::calculateNextGeneration()
 {
-    int neighbours;
     for (int i = 1; i <= getLines(); ++i)
     {
         for (int j = 1; j <= getRows(); ++j)
         {
             Cell& c = getCell(i, j);
-            if (c.getState() == STATE_BORDER)
-            {
-                c.setNextState(STATE_BORDER);
-                continue;
-            }
-            neighbours = 0;
-            if (getStateOf(i - 1, j - 1) == STATE_ALIVE) ++neighbours;
-            if (getStateOf(i - 1, j) == STATE_ALIVE) ++neighbours;
-            if (getStateOf(i - 1, j + 1) == STATE_ALIVE) ++neighbours;
-            if (getStateOf(i, j - 1) == STATE_ALIVE) ++neighbours;
-            if (getStateOf(i, j + 1) == STATE_ALIVE) ++neighbours;
-            if (getStateOf(i + 1, j - 1) == STATE_ALIVE) ++neighbours;
-            if (getStateOf(i + 1, j) == STATE_ALIVE) ++neighbours;
-            if (getStateOf(i + 1, j + 1) == STATE_ALIVE) ++neighbours;
-            c.setNextState(neighbours == 3 || (c.getState() == STATE_ALIVE && neighbours == 2) ? STATE_ALIVE : STATE_DEAD);
+            c.setNextState(c.calculateNextState());
         }
     }
 }

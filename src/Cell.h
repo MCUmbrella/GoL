@@ -16,12 +16,13 @@
 class Cell
 {
 private:
+    int line = 0, row = 0;
     CellState state = STATE_BORDER;
     CellState nextState = STATE_BORDER;
 public:
     Cell() = default;
 
-    explicit Cell(const CellState& state);
+    Cell(const int& line, const int& row, const CellState& state);
 
     CellState getState() const;
 
@@ -38,7 +39,30 @@ public:
      */
     std::string toString() const;
 
+    /**
+     * Converts the state of the cell to a character.
+     * @return '1' if alive, '0' if dead, '#' if border.
+     */
     char toChar() const;
+
+    /**
+     * Calculates the next state of the cell based on the states of the surrounding 8 cells.
+     * @return
+     * STATE_BORDER if:
+     * <ul>
+     * <li> the current state of the cell is STATE_BORDER </li>
+     * </ul>
+     * STATE_ALIVE if:
+     * <ul>
+     * <li> the cell is surrounded by 3 live cells </li>
+     * <li> or the cell is live and surrounded by 2 live cells </li>
+     * </ul>
+     * STATE_DEAD if:
+     * <ul>
+     * <li> none of the above conditions are met </li>
+     * </ul>
+     */
+    CellState calculateNextState() const;
 };
 
 #endif //GOL_CELL_H
