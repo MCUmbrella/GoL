@@ -32,6 +32,8 @@ private:
 
     void applyNextGeneration();
 
+    void cacheCellNeighbours();
+
 public:
     GoL(const GoL&) = delete;
 
@@ -86,6 +88,11 @@ public:
     int getRows() const;
 
     /**
+     * Check if the cell board has transparent border enabled.
+     */
+    bool isNoBorder() const;
+
+    /**
      * Gets the reference of a cell at the specified location.
      * @param line Line number, start from 1.
      * @param row Row number, start from 1.
@@ -108,10 +115,10 @@ public:
     void setStateOf(const int& line, const int& row, CellState state);
 
     /**
-     * Turns on/off the border.
-     * If the border has been turned off, the two sides of the cell board
-     * are connected, which means the cells will appear on the opposite
-     * side after moving towards the edge.
+     * Turns on/off the border. When the border is turned off, it becomes
+     * 'transparent', which means the two sides of the cell board are
+     * connected, and the cells will appear on the opposite side after
+     * moving towards the edge.
      * @param status The new border status.
      */
     GoL& toggleBorder(const bool& status);

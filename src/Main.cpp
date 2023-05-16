@@ -46,7 +46,7 @@ int main(int argc, char** argv)
              << " initFilePath:     The path of the text file used for cell board initialization." << endl
              << " targetGeneration: Maximum number of generation, default is infinite." << endl
              << " sleepMs:          Milliseconds to wait between iterations, default is 500." << endl
-             << " noBorder:         Disable the border of the cell board." << endl;
+             << " noBorder:         Turn on the transparent border feature." << endl;
         return 0;
     }
 

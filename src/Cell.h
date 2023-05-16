@@ -19,6 +19,7 @@ private:
     int line = 0, row = 0;
     CellState state = STATE_BORDER;
     CellState nextState = STATE_BORDER;
+    Cell* neighbours[8] = {};
 public:
     Cell() = default;
 
@@ -63,6 +64,15 @@ public:
      * </ul>
      */
     CellState calculateNextState() const;
+
+    /**
+     * Sets the neighbors of a cell.
+     * <br>
+     * This function must be called 8 times in a row when setting the neighbors
+     * of a cell, otherwise all subsequent operations of other cells will go wrong.
+     * @param c The pointer to a neighbour cell.
+     */
+    Cell& setNeighbour(Cell* c);
 };
 
 #endif //GOL_CELL_H

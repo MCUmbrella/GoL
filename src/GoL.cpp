@@ -33,6 +33,8 @@ GoL& GoL::init(const int& initLines, const int& initRows)
             else
                 cells[i].emplace_back(i, j, j == 0 || j == rows - 1 ? STATE_BORDER : STATE_DEAD);
 
+    cacheCellNeighbours();
+
     cout << "Cell board initialization completed" << endl;
     return *this;
 }
@@ -125,6 +127,24 @@ void GoL::applyNextGeneration()
     }
 }
 
+void GoL::cacheCellNeighbours()
+{
+    if (flNoBorder) return;
+    for (int i = 1; i <= getLines(); ++i)
+        for (int j = 1; j <= getRows(); ++j)
+        {
+            Cell& c = cells[i][j];
+            c.setNeighbour(&(cells[i - 1][j - 1]))
+             .setNeighbour(&(cells[i - 1][j]))
+             .setNeighbour(&(cells[i - 1][j + 1]))
+             .setNeighbour(&(cells[i][j - 1]))
+             .setNeighbour(&(cells[i][j + 1]))
+             .setNeighbour(&(cells[i + 1][j - 1]))
+             .setNeighbour(&(cells[i + 1][j]))
+             .setNeighbour(&(cells[i + 1][j + 1]));
+        }
+}
+
 GoL& GoL::display()
 {
     for (int i = 1; i <= getLines(); ++i)
@@ -149,6 +169,11 @@ int GoL::getLines() const
 int GoL::getRows() const
 {
     return rows - 2;
+}
+
+bool GoL::isNoBorder() const
+{
+    return flNoBorder;
 }
 
 Cell& GoL::getCell(const int& line, const int& row)
@@ -189,6 +214,7 @@ GoL& GoL::toggleBorder(const bool& status)
 
 GoL& GoL::revert(const int& steps)
 {
+    if (steps < 1) return *this;
     for (int i = 0; i != steps; ++i)
     {
         if (previousCells.empty())
@@ -197,6 +223,7 @@ GoL& GoL::revert(const int& steps)
         previousCells.pop();
         --currentGeneration;
     }
+    cacheCellNeighbours(); // when transparent border is off, remake neighbour cache after reverting to avoid some wild pointer issues
     return *this;
 }
 
