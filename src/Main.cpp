@@ -49,17 +49,16 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    // convert argv to a more comfortable String[]
-    string args[argc];
-    for (int i = 0; i != argc; ++i)
-        args[i] = string(argv[i]);
+    vector<string> args;
+    for (int i = 1; i != argc; ++i)
+        args.emplace_back(argv[i]);
 
-    for (int i = 0; i != argc; ++i)
-        if (args[i].rfind("--targetGeneration=", 0) == 0)
+    for (string& arg : args)
+        if (arg.rfind("--targetGeneration=", 0) == 0)
         {
             try
             {
-                targetGeneration = stoul(args[i].substr(19));
+                targetGeneration = stoul(arg.substr(19));
                 flInfiniteGenerations = false;
             }
             catch (...)
@@ -67,21 +66,21 @@ int main(int argc, char** argv)
                 // use default: flInfiniteGenerations = true
             }
         }
-        else if (args[i].rfind("--sleepMs=", 0) == 0)
+        else if (arg.rfind("--sleepMs=", 0) == 0)
             try
             {
-                sleepMs = stoi(args[i].substr(10));
+                sleepMs = stoi(arg.substr(10));
             }
             catch (...)
             {
                 // use default: sleepMs = 500
             }
-        else if (args[i] == "--noBorder")
+        else if (arg == "--noBorder")
             flNoBorder = true;
 
     GoL& app = GoL::getInstance();
     app.toggleBorder(flNoBorder);
-    app.init(args[1]); // pass the file path to the GoL simulator
+    app.init(args[0]); // pass the file path to the GoL simulator
     // display initial state if target generation is not specified
     if (flInfiniteGenerations) showMenu(0);
 
