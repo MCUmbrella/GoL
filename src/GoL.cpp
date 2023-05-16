@@ -3,6 +3,7 @@
 //
 
 #include <fstream>
+#include <sstream>
 #include "GoL.h"
 #include "Cell.h"
 #include "CommonUtil.h"
@@ -17,7 +18,7 @@ GoL& GoL::getInstance()
 
 GoL& GoL::init(const int& initLines, const int& initRows)
 {
-    if (initLines < 2 || initRows < 2) throw runtime_error("Invalid line number or row number");
+    if (initLines < 2 || initRows < 2) throw runtime_error("Line number and row number must be >= 2");
 
     // add a border with the width of 1 cell
     lines = initLines + 2;
@@ -57,14 +58,15 @@ GoL& GoL::init(const string& initFilePath)
         {
             if (line.length() != getRows())
                 throw runtime_error(
-                        string("Line length mismatch: expected ").append(to_string(getRows()).append(" but got ").append(to_string(line.length())))
+                        (stringstream() << "Line length mismatch: at line " << i + 1
+                                        << " expected " << getRows() << " but got " << line.length()).str()
                 );
             for (int j = 0; j != getRows(); ++j)
                 setStateOf(i + 1, j + 1, CommonUtil::parseCellState(line[j]));
         }
         else
             throw runtime_error(
-                    string("Total line number mismatch: expected ").append(to_string(getLines()).append(" but got ").append(to_string(i)))
+                    (stringstream() << "Total line number mismatch: expected " << getLines() << " but got " << i).str()
             );
     }
     cout << "Pattern setup completed" << endl;
@@ -170,7 +172,7 @@ Cell& GoL::getCell(const int& line, const int& row)
         return cells[CommonUtil::transparent(line, getLines())][CommonUtil::transparent(row, getRows())];
 
     if ((line < 1 || line > getLines()) || (row < 1 || row > getRows()))
-        throw out_of_range(string("Location out of bounds"));
+        throw out_of_range("Location out of bounds");
     return cells[line][row];
 }
 
@@ -190,7 +192,7 @@ void GoL::setStateOf(const int& line, const int& row, CellState state)
         cells[CommonUtil::transparent(line, getLines())][CommonUtil::transparent(row, getRows())].setState(state);
 
     if ((line < 1 || line > getLines()) || (row < 1 || row > getRows()))
-        throw out_of_range(string("Location out of bounds"));
+        throw out_of_range("Location out of bounds");
     cells[line][row].setState(state);
 }
 
