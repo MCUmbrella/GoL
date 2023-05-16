@@ -15,21 +15,15 @@ GoL& GoL::getInstance()
     return instance;
 }
 
-GoL& GoL::init(const string& initFilePath)
+GoL& GoL::init(const int& initLines, const int& initRows)
 {
-    cout << "Using input file: " << initFilePath << endl;
-    ifstream in(initFilePath);
-    if (!in) throw runtime_error(string("Unable to read input file: ").append(initFilePath));
-    // read line numbers and row numbers from input file
-    in >> lines;
-    in >> rows;
-    // add a border with the width of 1 cell
-    lines += 2;
-    rows += 2;
+    if (initLines < 2 || initRows < 2) throw runtime_error("Invalid line number or row number");
 
-    // initialize cells
-    if (lines < 4 || rows < 4) throw runtime_error("Invalid line number or row number");
-    cout << "Initializing cell board with size " << rows - 2 << " * " << lines - 2 << endl;
+    // add a border with the width of 1 cell
+    lines = initLines + 2;
+    rows = initRows + 2;
+
+    cout << "Initializing cell board with size " << initRows << " * " << initLines << endl;
     cells = vector<vector<Cell>>(lines);
     for (int i = 0; i != lines; ++i)
         for (int j = 0; j != rows; ++j)
@@ -37,7 +31,22 @@ GoL& GoL::init(const string& initFilePath)
                 cells[i].emplace_back(STATE_BORDER);
             else
                 cells[i].emplace_back(j == 0 || j == rows - 1 ? STATE_BORDER : STATE_DEAD);
+
     cout << "Cell board initialization completed" << endl;
+    return *this;
+}
+
+GoL& GoL::init(const string& initFilePath)
+{
+    cout << "Using input file: " << initFilePath << endl;
+    ifstream in(initFilePath);
+    if (!in) throw runtime_error(string("Unable to read input file: ").append(initFilePath));
+
+    // read line numbers and row numbers from input file
+    int l = 0, r = 0;
+    in >> l >> r;
+    // initialize cells
+    init(l, r);
 
     // read the pattern from the input file
     cout << "Loading pattern from input" << endl;
@@ -51,7 +60,7 @@ GoL& GoL::init(const string& initFilePath)
                         string("Line length mismatch: expected ").append(to_string(getRows()).append(" but got ").append(to_string(line.length())))
                 );
             for (int j = 0; j != getRows(); ++j)
-                setStateOf(i + 1, j + 1, CommonUtil::parseCellState(line.at(j)));
+                setStateOf(i + 1, j + 1, CommonUtil::parseCellState(line[j]));
         }
         else
             throw runtime_error(

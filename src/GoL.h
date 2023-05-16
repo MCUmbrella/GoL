@@ -43,6 +43,13 @@ public:
     static GoL& getInstance();
 
     /**
+     * Initialize an empty cell board with a specified size
+     * @param initLines The lines of the cell board (without border).
+     * @param initRows The rows of the cell board (without border).
+     */
+    GoL& init(const int& initLines, const int& initRows);
+
+    /**
      * Initialize the cell board from an input file.
      * @param initFilePath The path of the input file.
      */
