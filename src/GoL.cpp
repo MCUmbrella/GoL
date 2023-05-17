@@ -8,6 +8,8 @@
 #include "Cell.h"
 #include "CommonUtil.h"
 
+#define t CommonUtil::transparent
+
 using namespace std;
 
 GoL& GoL::getInstance()
@@ -132,20 +134,34 @@ void GoL::applyNextGeneration()
 
 void GoL::cacheCellNeighbours()
 {
-    if (flNoBorder) return;
-    for (int i = 1; i <= getLines(); ++i)
-        for (int j = 1; j <= getRows(); ++j)
-        {
-            Cell& c = cells[i][j];
-            c.setNeighbour(&(cells[i - 1][j - 1]))
-             .setNeighbour(&(cells[i - 1][j]))
-             .setNeighbour(&(cells[i - 1][j + 1]))
-             .setNeighbour(&(cells[i][j - 1]))
-             .setNeighbour(&(cells[i][j + 1]))
-             .setNeighbour(&(cells[i + 1][j - 1]))
-             .setNeighbour(&(cells[i + 1][j]))
-             .setNeighbour(&(cells[i + 1][j + 1]));
-        }
+    if (flNoBorder)
+        for (int i = 1; i <= getLines(); ++i)
+            for (int j = 1; j <= getRows(); ++j)
+            {
+                Cell& c = cells[i][j];
+                c.setNeighbour(&(cells[t(i - 1, getLines())][t(j - 1, getRows())]))
+                 .setNeighbour(&(cells[t(i - 1, getLines())][t(j, getRows())]))
+                 .setNeighbour(&(cells[t(i - 1, getLines())][t(j + 1, getRows())]))
+                 .setNeighbour(&(cells[t(i, getLines())][t(j - 1, getRows())]))
+                 .setNeighbour(&(cells[t(i, getLines())][t(j + 1, getRows())]))
+                 .setNeighbour(&(cells[t(i + 1, getLines())][t(j - 1, getRows())]))
+                 .setNeighbour(&(cells[t(i + 1, getLines())][t(j, getRows())]))
+                 .setNeighbour(&(cells[t(i + 1, getLines())][t(j + 1, getRows())]));
+            }
+    else
+        for (int i = 1; i <= getLines(); ++i)
+            for (int j = 1; j <= getRows(); ++j)
+            {
+                Cell& c = cells[i][j];
+                c.setNeighbour(&(cells[i - 1][j - 1]))
+                 .setNeighbour(&(cells[i - 1][j]))
+                 .setNeighbour(&(cells[i - 1][j + 1]))
+                 .setNeighbour(&(cells[i][j - 1]))
+                 .setNeighbour(&(cells[i][j + 1]))
+                 .setNeighbour(&(cells[i + 1][j - 1]))
+                 .setNeighbour(&(cells[i + 1][j]))
+                 .setNeighbour(&(cells[i + 1][j + 1]));
+            }
 }
 
 GoL& GoL::display()
@@ -182,7 +198,7 @@ bool GoL::isNoBorder() const
 Cell& GoL::getCell(const int& line, const int& row)
 {
     if (flNoBorder)
-        return cells[CommonUtil::transparent(line, getLines())][CommonUtil::transparent(row, getRows())];
+        return cells[t(line, getLines())][t(row, getRows())];
 
     if ((line < 1 || line > getLines()) || (row < 1 || row > getRows()))
         throw out_of_range("Location out of bounds");
@@ -192,7 +208,7 @@ Cell& GoL::getCell(const int& line, const int& row)
 CellState GoL::getStateOf(const int& line, const int& row)
 {
     if (flNoBorder)
-        return cells[CommonUtil::transparent(line, getLines())][CommonUtil::transparent(row, getRows())].getState();
+        return cells[t(line, getLines())][t(row, getRows())].getState();
 
     if ((line < 1 || line > getLines()) || (row < 1 || row > getRows()))
         return STATE_BORDER;
@@ -202,7 +218,7 @@ CellState GoL::getStateOf(const int& line, const int& row)
 void GoL::setStateOf(const int& line, const int& row, CellState state)
 {
     if (flNoBorder)
-        cells[CommonUtil::transparent(line, getLines())][CommonUtil::transparent(row, getRows())].setState(state);
+        cells[t(line, getLines())][t(row, getRows())].setState(state);
 
     if ((line < 1 || line > getLines()) || (row < 1 || row > getRows()))
         throw out_of_range("Location out of bounds");
@@ -226,7 +242,7 @@ GoL& GoL::revert(const int& steps)
         previousCells.pop();
         --currentGeneration;
     }
-    cacheCellNeighbours(); // when transparent border is off, remake neighbour cache after reverting to avoid some wild pointer issues
+    cacheCellNeighbours(); // remake neighbour cache after reverting to avoid some wild pointer issues
     return *this;
 }
 
