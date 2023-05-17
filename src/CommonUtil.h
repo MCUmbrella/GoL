@@ -7,28 +7,31 @@
 
 #include "CellState.h"
 
+/**
+ * 工具类，包含各种有用的函数
+ */
 class CommonUtil
 {
 public:
     /**
-     * Parses the CellState from a character.
-     * @param c The character to parse.
-     * @return STATE_ALIVE if '1', STATE_DEAD if '0', otherwise STATE_BORDER.
+     * 将char解析为CellState
+     * @return '1'为STATE_ALIVE，'0'为STATE_DEAD，其它为STATE_BORDER
      */
     static CellState parseCellState(const char& c);
 
     /**
-     * Freezes the program for a few moment.
-     * @param ms The milliseconds of the time to freeze.
+     * 暂停程序一段时间
+     * @param ms 暂停多少毫秒？
      */
     static void freeze(const unsigned int& ms);
 
     /**
-     * Clears the terminal emulator.
+     * 清除控制台上显示的内容
      */
     static void clearScreen();
 
     /**
+     * 用于映射透明边界下的坐标
      * @code
      *            / l               (x mod l = 0)
      * t(x, l) = {  x mod l         (x ＞ 0)

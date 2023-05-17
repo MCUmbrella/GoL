@@ -53,7 +53,7 @@ char Cell::toChar() const
 CellState Cell::calculateNextState() const
 {
     if (state == STATE_BORDER) return STATE_BORDER;
-    int live = 0;
+    int live = 0; // 周围活细胞数
     for (const auto& c : neighbours)
         if (c->getState() == STATE_ALIVE) ++live;
     return live == 3 || (state == STATE_ALIVE && live == 2) ? STATE_ALIVE : STATE_DEAD;
@@ -61,8 +61,8 @@ CellState Cell::calculateNextState() const
 
 Cell& Cell::setNeighbour(Cell* c)
 {
-    static unsigned char i = 0;
-    i %= 8;
+    static unsigned char i = 0; // static表示i对于所有细胞实例都具有同一值，方便复用
+    i %= 8; // i为8即表示一个细胞的周边缓存设置完毕，重置为0以便下个细胞进行设置
     neighbours[i] = c;
     ++i;
     return *this;

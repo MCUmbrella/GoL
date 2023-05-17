@@ -8,84 +8,86 @@
 #include "Cell.h"
 #include "CommonUtil.h"
 
+// 设置CommonUtil::transparent的别名为t，节省字数
 #define t CommonUtil::transparent
 
 using namespace std;
 
 GoL& GoL::getInstance()
 {
-    static GoL instance;
+    static GoL instance; // 引擎的唯一实例在程序开始运行时被自动初始化
     return instance;
 }
 
 GoL& GoL::init(const int& initLines, const int& initRows)
 {
-    if (initLines < 2 || initRows < 2) throw runtime_error("Line number and row number must be >= 2");
+    if (initLines < 2 || initRows < 2) throw runtime_error("行数和列数必须大于2");
 
-    // add a border with the width of 1 cell
+    // 在输入大小的基础上添加1细胞宽的边界，方便后期处理
     lines = initLines + 2;
     rows = initRows + 2;
 
-    cout << "Initializing cell board with size " << initRows << " * " << initLines << endl;
+    cout << "培养皿正在初始化，大小: " << initRows << " * " << initLines << endl;
     cells = vector<vector<Cell>>(lines);
     for (int i = 0; i != lines; ++i)
         for (int j = 0; j != rows; ++j)
             if (i == 0 || i == lines - 1)
-                cells[i].emplace_back(STATE_BORDER);
+                cells[i].emplace_back(STATE_BORDER); // 上下边界，初始化为边界细胞
             else
-                cells[i].emplace_back(j == 0 || j == rows - 1 ? STATE_BORDER : STATE_DEAD);
+                cells[i].emplace_back(j == 0 || j == rows - 1 ? STATE_BORDER : STATE_DEAD); // 左右边界初始化为边界细胞，其余初始化为死细胞
 
     cacheCellNeighbours();
 
-    cout << "Cell board initialization completed" << endl;
+    cout << "培养皿初始化完成" << endl;
     return *this;
 }
 
 GoL& GoL::init(const string& initFilePath)
 {
-    cout << "Using input file: " << initFilePath << endl;
-    ifstream in(initFilePath);
-    if (!in) throw runtime_error(string("Unable to read input file: ").append(initFilePath));
+    cout << "使用存档文件: " << initFilePath << endl;
+    ifstream in(initFilePath); // 以指定路径创建一个文件输入流
+    if (!in) // 文件输入流无效？
+        throw runtime_error(string("读取失败: ").append(initFilePath));
 
-    // read line numbers and row numbers from input file
+    // 读取存档的头两个数
     int l = 0, r = 0;
     in >> l >> r;
-    // initialize cells
+    // 初始化培养皿大小
     init(l, r);
 
-    // read the pattern from the input file
-    cout << "Loading pattern from input" << endl;
+    // 从存档应用培养皿状态
+    cout << "正在读取培养皿状态" << endl;
     string line;
     for (int i = 0; i != getLines(); ++i)
     {
         if (in >> line)
         {
-            if (line.length() != getRows())
+            if (line.length() != getRows()) // 行长和开头记录的列数不一致？
             {
                 stringstream msg;
-                msg << "Line length mismatch: at line " << i + 1 << " expected " << getRows() << " but got " << line.length();
+                msg << "行长不匹配: 行 " << i + 1 << " 长度应为 " << getRows() << " 实际为 " << line.length();
                 throw runtime_error(msg.str());
             }
             for (int j = 0; j != getRows(); ++j)
                 setStateOf(i + 1, j + 1, CommonUtil::parseCellState(line[j]));
         }
-        else
+        else // 数据行数和开头记录的行数不一致？
         {
             stringstream msg;
-            msg << "Total line number mismatch: expected " << getLines() << " but got " << i;
+            msg << "行数不匹配: 应为 " << getLines() << " 实际为 " << i;
             throw runtime_error(msg.str());
         }
     }
-    cout << "Pattern setup completed" << endl;
-    in.close();
-    cout << "Initialization completed" << endl;
+    cout << "培养皿状态加载完成" << endl;
+    in.close(); // 及时关闭输入流，释放资源
+    cout << "初始化完成" << endl;
     return *this;
 }
 
 GoL& GoL::save(const string& filePath)
 {
-    ofstream out(filePath);
-    if (!out.bad())
+    ofstream out(filePath); // 以指定路径构建文件输出流
+    if (out.good()) // 输出流正常？
     {
         out << getLines() << ' ' << getRows() << endl;
         for (int i = 1; i <= getLines(); ++i)
@@ -101,7 +103,7 @@ GoL& GoL::save(const string& filePath)
 
 GoL& GoL::run()
 {
-    previousCells.push(vector<vector<Cell>>(cells));
+    previousCells.push(vector<vector<Cell>>(cells)); // 把当前培养皿状态复制一份压入历史记录顶端
     calculateNextGeneration();
     applyNextGeneration();
     ++currentGeneration;
@@ -134,9 +136,9 @@ void GoL::applyNextGeneration()
 
 void GoL::cacheCellNeighbours()
 {
-    if (flNoBorder)
+    if (flNoBorder) // 透明边界开启，使用t函数进行坐标映射
         for (int i = 1; i <= getLines(); ++i)
-            for (int j = 1; j <= getRows(); ++j)
+            for (int j = 1; j <= getRows(); ++j) // 边界细胞不参与迭代，无需设置周边缓存
             {
                 Cell& c = cells[i][j];
                 c.setNeighbour(&(cells[t(i - 1, getLines())][t(j - 1, getRows())]))
@@ -166,14 +168,14 @@ void GoL::cacheCellNeighbours()
 
 GoL& GoL::display(const bool& border)
 {
-    if (border)
+    if (border) // 需要显示边界？
         for (int i = 0; i != lines; ++i)
         {
             for (int j = 0; j != rows; ++j)
                 cout << cells[i][j].toString();
             cout << endl;
         }
-    else
+    else // 跳过边界索引
         for (int i = 1; i <= getLines(); ++i)
         {
             for (int j = 1; j <= getRows(); ++j)
@@ -205,11 +207,11 @@ bool GoL::isNoBorder() const
 
 Cell& GoL::getCell(const int& line, const int& row)
 {
-    if (flNoBorder)
+    if (flNoBorder) // 透明边界开启，使用t函数进行坐标映射
         return cells[t(line, getLines())][t(row, getRows())];
 
     if ((line < 1 || line > getLines()) || (row < 1 || row > getRows()))
-        throw out_of_range("Location out of bounds");
+        throw out_of_range("getCell(): 坐标越界");
     return cells[line][row];
 }
 
@@ -229,7 +231,7 @@ void GoL::setStateOf(const int& line, const int& row, CellState state)
         cells[t(line, getLines())][t(row, getRows())].setState(state);
 
     if ((line < 1 || line > getLines()) || (row < 1 || row > getRows()))
-        throw out_of_range("Location out of bounds");
+        throw out_of_range("setStateOf(): 坐标越界");
     cells[line][row].setState(state);
 }
 
@@ -241,16 +243,16 @@ GoL& GoL::toggleBorder(const bool& status)
 
 GoL& GoL::revert(const int& steps)
 {
-    if (steps < 1) return *this;
+    if (steps < 1) return *this; // 至少回退1代，否则不做任何操作
     for (int i = 0; i != steps; ++i)
     {
-        if (previousCells.empty())
-            break;
-        cells = vector<vector<Cell>>(previousCells.top());
-        previousCells.pop();
-        --currentGeneration;
+        if (previousCells.empty()) // 历史记录空了？
+            break; // 提前结束回退操作
+        cells = vector<vector<Cell>>(previousCells.top()); // 用历史记录最顶上的状态覆盖当前培养皿的状态
+        previousCells.pop(); // 删除最顶上的历史记录
+        --currentGeneration; // 更新迭代计数
     }
-    cacheCellNeighbours(); // remake neighbour cache after reverting to avoid some wild pointer issues
+    cacheCellNeighbours(); // 重新给每个（非边界）细胞编制缓存，因为内存地址有变
     return *this;
 }
 

@@ -25,18 +25,18 @@ CellState CommonUtil::parseCellState(const char& c)
 void CommonUtil::freeze(const unsigned int& ms)
 {
 #ifdef _WIN32
-    Sleep(ms);
+    Sleep(ms); // 使用Windows自带的Sleep函数
 #else
-    usleep(ms * 1000U);
+    usleep(ms * 1000U); // 目标系统不是Windows，使用UNIX标准定义的usleep函数
 #endif
 }
 
 void CommonUtil::clearScreen()
 {
 #ifdef _WIN32
-    system("cls");
+    system("cls"); // 使用Windows自带的cls命令（极慢，可能导致画面撕裂）
 #else
-    std::cout << "\033[2J" << "\033[H";
+    std::cout << "\033[2J" << "\033[H"; // 目标系统不是Windows，使用VT100控制字符
 #endif
 }
 
