@@ -16,14 +16,13 @@
 class Cell
 {
 private:
-    int line = 0, row = 0;
     CellState state = STATE_BORDER;
     CellState nextState = STATE_BORDER;
     Cell* neighbours[8] = {};
 public:
     Cell() = default;
 
-    Cell(const int& line, const int& row, const CellState& state);
+    explicit Cell(const CellState& state);
 
     CellState getState() const;
 

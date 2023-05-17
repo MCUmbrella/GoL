@@ -3,7 +3,6 @@
 //
 
 #include "Cell.h"
-#include "GoL.h"
 
 std::string Cell::toString() const
 {
@@ -18,10 +17,8 @@ std::string Cell::toString() const
 #endif
 }
 
-Cell::Cell(const int& line, const int& row, const CellState& state)
+Cell::Cell(const CellState& state)
 {
-    this->line = line;
-    this->row = row;
     this->state = state;
     this->nextState = state;
 }

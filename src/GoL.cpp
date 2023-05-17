@@ -31,9 +31,9 @@ GoL& GoL::init(const int& initLines, const int& initRows)
     for (int i = 0; i != lines; ++i)
         for (int j = 0; j != rows; ++j)
             if (i == 0 || i == lines - 1)
-                cells[i].emplace_back(i, j, STATE_BORDER);
+                cells[i].emplace_back(STATE_BORDER);
             else
-                cells[i].emplace_back(i, j, j == 0 || j == rows - 1 ? STATE_BORDER : STATE_DEAD);
+                cells[i].emplace_back(j == 0 || j == rows - 1 ? STATE_BORDER : STATE_DEAD);
 
     cacheCellNeighbours();
 
