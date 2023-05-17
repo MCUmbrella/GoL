@@ -4,7 +4,7 @@
 
 using namespace std;
 
-static bool flInfiniteGenerations = true, flPause = false, flNoBorder = false;
+static bool flInfiniteGenerations = true, flPause = false, flNoBorder = false, flShowBorder = false;
 static unsigned int sleepMs = 500;
 static unsigned long targetGeneration;
 
@@ -40,16 +40,18 @@ int main(int argc, char** argv)
 {
     if (argc < 2) // no input file specified. print help message
     {
-        cout << "Usage: GoL <--new / initFilePath> [--targetGeneration={}] [--sleepMs={}] [--noBorder]" << endl
+        cout << "Usage: GoL <--new / initFilePath> [--targetGeneration={}] [--sleepMs={}] [--noBorder] [--showBorder]" << endl
              << "Parameters:" << endl
              << " new:              Create a new empty cell board." << endl
              << " initFilePath:     The path of the text file used for cell board initialization." << endl
              << " targetGeneration: Maximum number of generation, default is infinite." << endl
              << " sleepMs:          Milliseconds to wait between iterations, default is 500." << endl
-             << " noBorder:         Turn on the transparent border feature." << endl;
+             << " noBorder:         Turn on the transparent border feature." << endl
+             << " showBorder:       Also print the border when displaying." << endl;
         return 0;
     }
 
+    // parse command arguments
     vector<string> args;
     for (int i = 1; i != argc; ++i)
         args.emplace_back(argv[i]);
@@ -78,7 +80,10 @@ int main(int argc, char** argv)
             }
         else if (arg == "--noBorder")
             flNoBorder = true;
+        else if (arg == "--showBorder")
+            flShowBorder = true;
 
+    // initialize the engine
     GoL& app = GoL::getInstance();
     app.toggleBorder(flNoBorder);
     if (args[0] == "--new") // create new board
@@ -115,7 +120,7 @@ void mainLoop()
             continue;
         }
         CommonUtil::clearScreen();
-        app.run().display(); // iterate once and display the new state
+        app.run().display(flShowBorder); // iterate once and display the new state
         cout << "Current generation: " << app.getCurrentGeneration()
              << ". Board size: " << app.getRows() << "*" << app.getLines() << endl
              << "[Ctrl+C]Pause" << endl;
@@ -134,7 +139,7 @@ void showMenu(int)
     {
         // display current state
         CommonUtil::clearScreen();
-        app.display();
+        app.display(flShowBorder);
         cout << "Current generation: " << app.getCurrentGeneration()
              << ". Board size: " << app.getRows() << "*" << app.getLines() << endl;
 

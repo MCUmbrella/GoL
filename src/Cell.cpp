@@ -57,7 +57,6 @@ CellState Cell::calculateNextState() const
 {
     if (state == STATE_BORDER) return STATE_BORDER;
     int live = 0;
-    GoL& app = GoL::getInstance();
     for (const auto& c : neighbours)
         if (c->getState() == STATE_ALIVE) ++live;
     return live == 3 || (state == STATE_ALIVE && live == 2) ? STATE_ALIVE : STATE_DEAD;

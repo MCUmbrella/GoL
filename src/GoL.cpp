@@ -164,14 +164,22 @@ void GoL::cacheCellNeighbours()
             }
 }
 
-GoL& GoL::display()
+GoL& GoL::display(const bool& border)
 {
-    for (int i = 1; i <= getLines(); ++i)
-    {
-        for (int j = 1; j <= getRows(); ++j)
-            cout << cells[i][j].toString();
-        cout << endl;
-    }
+    if (border)
+        for (int i = 0; i != lines; ++i)
+        {
+            for (int j = 0; j != rows; ++j)
+                cout << cells[i][j].toString();
+            cout << endl;
+        }
+    else
+        for (int i = 1; i <= getLines(); ++i)
+        {
+            for (int j = 1; j <= getRows(); ++j)
+                cout << cells[i][j].toString();
+            cout << endl;
+        }
     return *this;
 }
 

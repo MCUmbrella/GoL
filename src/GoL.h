@@ -70,8 +70,9 @@ public:
 
     /**
      * Prints the current state of the cell board to the terminal.
+     * @param border Also print the border when set to true.
      */
-    GoL& display();
+    GoL& display(const bool& border);
 
     int getCurrentGeneration() const;
 
