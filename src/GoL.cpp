@@ -18,22 +18,22 @@ GoL& GoL::getInstance()
     return instance;
 }
 
-GoL& GoL::init(const int& initLines, const int& initRows)
+GoL& GoL::init(const int& initLines, const int& initColumns)
 {
-    if (initLines < 2 || initRows < 2) throw runtime_error("Line number and row number must be >= 2");
+    if (initLines < 2 || initColumns < 2) throw runtime_error("Line number and column number must be >= 2");
 
     // add a border with the width of 1 cell
     lines = initLines + 2;
-    rows = initRows + 2;
+    columns = initColumns + 2;
 
-    cout << "Initializing cell board with size " << initRows << " * " << initLines << endl;
+    cout << "Initializing cell board with size " << initColumns << " * " << initLines << endl;
     cells = vector<vector<Cell>>(lines);
     for (int i = 0; i != lines; ++i)
-        for (int j = 0; j != rows; ++j)
+        for (int j = 0; j != columns; ++j)
             if (i == 0 || i == lines - 1)
                 cells[i].emplace_back(STATE_BORDER);
             else
-                cells[i].emplace_back(j == 0 || j == rows - 1 ? STATE_BORDER : STATE_DEAD);
+                cells[i].emplace_back(j == 0 || j == columns - 1 ? STATE_BORDER : STATE_DEAD);
 
     cacheCellNeighbours();
 
@@ -47,11 +47,11 @@ GoL& GoL::init(const string& initFilePath)
     ifstream in(initFilePath);
     if (!in) throw runtime_error(string("Unable to read input file: ").append(initFilePath));
 
-    // read line numbers and row numbers from input file
-    int l = 0, r = 0;
-    in >> l >> r;
+    // read line numbers and column numbers from input file
+    int savedLines = 0, savedColumns = 0;
+    in >> savedLines >> savedColumns;
     // initialize cells
-    init(l, r);
+    init(savedLines, savedColumns);
 
     // read the pattern from the input file
     cout << "Loading pattern from input" << endl;
@@ -60,13 +60,13 @@ GoL& GoL::init(const string& initFilePath)
     {
         if (in >> line)
         {
-            if (line.length() != getRows())
+            if (line.length() != getColumns())
             {
                 stringstream msg;
-                msg << "Line length mismatch: at line " << i + 1 << " expected " << getRows() << " but got " << line.length();
+                msg << "Line length mismatch: at line " << i + 1 << " expected " << getColumns() << " but got " << line.length();
                 throw runtime_error(msg.str());
             }
-            for (int j = 0; j != getRows(); ++j)
+            for (int j = 0; j != getColumns(); ++j)
                 setStateOf(i + 1, j + 1, CommonUtil::parseCellState(line[j]));
         }
         else
@@ -87,10 +87,10 @@ GoL& GoL::save(const string& filePath)
     ofstream out(filePath);
     if (out)
     {
-        out << getLines() << ' ' << getRows() << endl;
+        out << getLines() << ' ' << getColumns() << endl;
         for (int i = 1; i <= getLines(); ++i)
         {
-            for (int j = 1; j <= getRows(); ++j)
+            for (int j = 1; j <= getColumns(); ++j)
                 out << cells[i][j].toChar();
             out << endl;
         }
@@ -112,7 +112,7 @@ void GoL::calculateNextGeneration()
 {
     for (int i = 1; i <= getLines(); ++i)
     {
-        for (int j = 1; j <= getRows(); ++j)
+        for (int j = 1; j <= getColumns(); ++j)
         {
             Cell& c = getCell(i, j);
             c.setNextState(c.calculateNextState());
@@ -124,7 +124,7 @@ void GoL::applyNextGeneration()
 {
     for (int i = 1; i <= getLines(); ++i)
     {
-        for (int j = 1; j <= getRows(); ++j)
+        for (int j = 1; j <= getColumns(); ++j)
         {
             Cell& c = getCell(i, j);
             c.setState(c.getNextState());
@@ -136,21 +136,21 @@ void GoL::cacheCellNeighbours()
 {
     if (flNoBorder)
         for (int i = 1; i <= getLines(); ++i)
-            for (int j = 1; j <= getRows(); ++j)
+            for (int j = 1; j <= getColumns(); ++j)
             {
                 Cell& c = cells[i][j];
-                c.setNeighbour(&(cells[t(i - 1, getLines())][t(j - 1, getRows())]))
-                 .setNeighbour(&(cells[t(i - 1, getLines())][t(j, getRows())]))
-                 .setNeighbour(&(cells[t(i - 1, getLines())][t(j + 1, getRows())]))
-                 .setNeighbour(&(cells[t(i, getLines())][t(j - 1, getRows())]))
-                 .setNeighbour(&(cells[t(i, getLines())][t(j + 1, getRows())]))
-                 .setNeighbour(&(cells[t(i + 1, getLines())][t(j - 1, getRows())]))
-                 .setNeighbour(&(cells[t(i + 1, getLines())][t(j, getRows())]))
-                 .setNeighbour(&(cells[t(i + 1, getLines())][t(j + 1, getRows())]));
+                c.setNeighbour(&(cells[t(i - 1, getLines())][t(j - 1, getColumns())]))
+                 .setNeighbour(&(cells[t(i - 1, getLines())][t(j, getColumns())]))
+                 .setNeighbour(&(cells[t(i - 1, getLines())][t(j + 1, getColumns())]))
+                 .setNeighbour(&(cells[t(i, getLines())][t(j - 1, getColumns())]))
+                 .setNeighbour(&(cells[t(i, getLines())][t(j + 1, getColumns())]))
+                 .setNeighbour(&(cells[t(i + 1, getLines())][t(j - 1, getColumns())]))
+                 .setNeighbour(&(cells[t(i + 1, getLines())][t(j, getColumns())]))
+                 .setNeighbour(&(cells[t(i + 1, getLines())][t(j + 1, getColumns())]));
             }
     else
         for (int i = 1; i <= getLines(); ++i)
-            for (int j = 1; j <= getRows(); ++j)
+            for (int j = 1; j <= getColumns(); ++j)
             {
                 Cell& c = cells[i][j];
                 c.setNeighbour(&(cells[i - 1][j - 1]))
@@ -169,14 +169,14 @@ GoL& GoL::display(const bool& border)
     if (border)
         for (int i = 0; i != lines; ++i)
         {
-            for (int j = 0; j != rows; ++j)
+            for (int j = 0; j != columns; ++j)
                 cout << cells[i][j].toString();
             cout << endl;
         }
     else
         for (int i = 1; i <= getLines(); ++i)
         {
-            for (int j = 1; j <= getRows(); ++j)
+            for (int j = 1; j <= getColumns(); ++j)
                 cout << cells[i][j].toString();
             cout << endl;
         }
@@ -193,9 +193,9 @@ int GoL::getLines() const
     return lines - 2;
 }
 
-int GoL::getRows() const
+int GoL::getColumns() const
 {
-    return rows - 2;
+    return columns - 2;
 }
 
 bool GoL::isNoBorder() const
@@ -203,34 +203,24 @@ bool GoL::isNoBorder() const
     return flNoBorder;
 }
 
-Cell& GoL::getCell(const int& line, const int& row)
+Cell& GoL::getCell(const int& line, const int& column)
 {
     if (flNoBorder)
-        return cells[t(line, getLines())][t(row, getRows())];
+        return cells[t(line, getLines())][t(column, getColumns())];
 
-    if ((line < 1 || line > getLines()) || (row < 1 || row > getRows()))
+    if ((line < 1 || line > getLines()) || (column < 1 || column > getColumns()))
         throw out_of_range("Location out of bounds");
-    return cells[line][row];
+    return cells[line][column];
 }
 
-CellState GoL::getStateOf(const int& line, const int& row)
+void GoL::setStateOf(const int& line, const int& column, CellState state)
 {
     if (flNoBorder)
-        return cells[t(line, getLines())][t(row, getRows())].getState();
+        cells[t(line, getLines())][t(column, getColumns())].setState(state);
 
-    if ((line < 1 || line > getLines()) || (row < 1 || row > getRows()))
-        return STATE_BORDER;
-    return cells[line][row].getState();
-}
-
-void GoL::setStateOf(const int& line, const int& row, CellState state)
-{
-    if (flNoBorder)
-        cells[t(line, getLines())][t(row, getRows())].setState(state);
-
-    if ((line < 1 || line > getLines()) || (row < 1 || row > getRows()))
+    if ((line < 1 || line > getLines()) || (column < 1 || column > getColumns()))
         throw out_of_range("Location out of bounds");
-    cells[line][row].setState(state);
+    cells[line][column].setState(state);
 }
 
 GoL& GoL::toggleNoBorder(const bool& status)

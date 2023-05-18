@@ -88,11 +88,11 @@ int main(int argc, char** argv)
     app.toggleNoBorder(flNoBorder);
     if (args[0] == "--new") // create new board
     {
-        int lines = 0, rows = 0;
+        int lines = 0, columns = 0;
         cout << "Enter: Size (X Y)" << endl << "? ";
         cout.flush();
-        cin >> rows >> lines;
-        app.init(lines, rows);
+        cin >> columns >> lines;
+        app.init(lines, columns);
         showMenu(0);
     }
     else // load the board from local file
@@ -122,7 +122,7 @@ void mainLoop()
         CommonUtil::clearScreen();
         app.run().display(flShowBorder); // iterate once and display the new state
         cout << "Current generation: " << app.getCurrentGeneration()
-             << ". Board size: " << app.getRows() << "*" << app.getLines() << endl
+             << ". Board size: " << app.getColumns() << "*" << app.getLines() << endl
              << "[Ctrl+C]Pause" << endl;
         flush(cout);
         CommonUtil::freeze(sleepMs); // wait a few moment to avoid the program from running too fast
@@ -141,7 +141,7 @@ void showMenu(int)
         CommonUtil::clearScreen();
         app.display(flShowBorder);
         cout << "Current generation: " << app.getCurrentGeneration()
-             << ". Board size: " << app.getRows() << "*" << app.getLines() << endl;
+             << ". Board size: " << app.getColumns() << "*" << app.getLines() << endl;
 
         // ask for option
         cout << "[Q]Exit [W]Start/Resume [E]Edit [R]Revert [T]Goto [Y]Export" << endl << "? ";
@@ -164,7 +164,7 @@ void showMenu(int)
             flush(cout);
             int x, y;
             char state;
-            if (cin >> x >> y >> state && x > 0 && x <= app.getRows() && y > 0 && y <= app.getLines())
+            if (cin >> x >> y >> state && x > 0 && x <= app.getColumns() && y > 0 && y <= app.getLines())
                 app.setStateOf(y, x, CommonUtil::parseCellState(state));
         }
         else if (s == "r" || s == "R") // revert
@@ -179,18 +179,12 @@ void showMenu(int)
             if (cin >> g)
             {
                 if (g == app.getCurrentGeneration()) continue;
+                cout << "Please wait";
+                flush(cout);
                 if (g > app.getCurrentGeneration())
-                {
-                    cout << "Please wait";
-                    flush(cout);
                     app.forward(g - app.getCurrentGeneration());
-                }
                 else
-                {
-                    cout << "Please wait";
-                    flush(cout);
                     app.revert(app.getCurrentGeneration() - g);
-                }
             }
         }
         else if (s == "y" || s == "Y") // export

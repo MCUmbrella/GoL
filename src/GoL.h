@@ -14,13 +14,13 @@ using std::vector;
 using std::stack;
 
 /**
- * The Game of Life engine, a singleton application.
+ * The Game of Life simulation engine, designed with singleton pattern.
  */
 class GoL
 {
 private:
     bool flNoBorder = false;
-    int currentGeneration = 0, rows = 0, lines = 0;
+    int currentGeneration = 0, lines = 0, columns = 0;
     vector<vector<Cell>> cells; // the cell board
     stack<vector<vector<Cell>>> previousCells; // the previous state of the cell board
 
@@ -28,10 +28,20 @@ private:
 
     ~GoL() = default;
 
+    /**
+     * Let each cell calculate and set its next state.
+     */
     void calculateNextGeneration();
 
+    /**
+     * Let each cell apply its next state and finally let the
+     * generation counter +1, i.e., complete an iteration.
+     */
     void applyNextGeneration();
 
+    /**
+     * Set each (non-border) cell's neighbour cache.
+     */
     void cacheCellNeighbours();
 
 public:
@@ -47,9 +57,9 @@ public:
     /**
      * Initialize an empty cell board with a specified size
      * @param initLines The lines of the cell board (without border).
-     * @param initRows The rows of the cell board (without border).
+     * @param initColumns The columns of the cell board (without border).
      */
-    GoL& init(const int& initLines, const int& initRows);
+    GoL& init(const int& initLines, const int& initColumns);
 
     /**
      * Initialize the cell board from an input file.
@@ -83,10 +93,10 @@ public:
     int getLines() const;
 
     /**
-     * How many rows does the cell board have?
-     * @return The total rows of the cell board, the border is not included.
+     * How many columns does the cell board have?
+     * @return The total columns of the cell board, the border is not included.
      */
-    int getRows() const;
+    int getColumns() const;
 
     /**
      * Check if the cell board has transparent border enabled.
@@ -96,24 +106,17 @@ public:
     /**
      * Gets the reference of a cell at the specified location.
      * @param line Line number, start from 1.
-     * @param row Row number, start from 1.
+     * @param column Column number, start from 1.
      */
-    Cell& getCell(const int& line, const int& row);
-
-    /**
-     * Gets the current state of a cell at the specified location.
-     * @param line Line number, start from 1.
-     * @param row Row number, start from 1.
-     */
-    CellState getStateOf(const int& line, const int& row);
+    Cell& getCell(const int& line, const int& column);
 
     /**
      * Sets the current state of a cell at the specified location.
      * @param line Line number, start from 1.
-     * @param row Row number, start from 1.
+     * @param column Column number, start from 1.
      * @param state The new state of the cell.
      */
-    void setStateOf(const int& line, const int& row, CellState state);
+    void setStateOf(const int& line, const int& column, CellState state);
 
     /**
      * Turns on/off the border. When the border is turned off, it becomes
