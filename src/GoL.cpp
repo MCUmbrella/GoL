@@ -236,7 +236,7 @@ GoL& GoL::revert(const int& steps)
     {
         if (previousCells.empty())
             break;
-        cells = vector<vector<Cell>>(previousCells.top());
+        cells.swap(previousCells.top());
         previousCells.pop();
         --currentGeneration;
     }
