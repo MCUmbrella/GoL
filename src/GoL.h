@@ -122,7 +122,7 @@ public:
      * moving towards the edge.
      * @param status The new border status.
      */
-    GoL& toggleBorder(const bool& status);
+    GoL& toggleNoBorder(const bool& status);
 
     /**
      * Undo a specified amount of iterations.

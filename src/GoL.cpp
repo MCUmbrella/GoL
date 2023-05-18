@@ -85,7 +85,7 @@ GoL& GoL::init(const string& initFilePath)
 GoL& GoL::save(const string& filePath)
 {
     ofstream out(filePath);
-    if (!out.bad())
+    if (out)
     {
         out << getLines() << ' ' << getRows() << endl;
         for (int i = 1; i <= getLines(); ++i)
@@ -233,7 +233,7 @@ void GoL::setStateOf(const int& line, const int& row, CellState state)
     cells[line][row].setState(state);
 }
 
-GoL& GoL::toggleBorder(const bool& status)
+GoL& GoL::toggleNoBorder(const bool& status)
 {
     flNoBorder = status;
     return *this;

@@ -85,7 +85,7 @@ int main(int argc, char** argv)
 
     // initialize the engine
     GoL& app = GoL::getInstance();
-    app.toggleBorder(flNoBorder);
+    app.toggleNoBorder(flNoBorder);
     if (args[0] == "--new") // create new board
     {
         int lines = 0, rows = 0;
